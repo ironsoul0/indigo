@@ -214,7 +214,6 @@ def notify_webwork(bot, update, job_queue):
         for webwork in webworks:
           bot.send_message(chat_id=update.message.chat_id, text='• {} - {}'.format(section, webwork))
       set_webworks_for_chat(update.message.chat_id, res)
-      job_check = job_queue.run_repeating(check_new_webworks, interval=10, first=10, context=update.message.chat_id)
       print(job_check)
       
 
