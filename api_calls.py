@@ -11,7 +11,7 @@ def update_username(chat_id, new_username):
     'content-type': 'application/json; charset=utf-8'
   }
   requests.post(
-    '{}/set_username/{}'.format(API_URL, chat_id),
+    '{}/update_username/{}'.format(API_URL, chat_id),
     data=json.dumps(payload),
     headers=headers
   )
@@ -24,7 +24,7 @@ def update_webwork_password(chat_id, new_password):
     'content-type': 'application/json; charset=utf-8'
   }
   requests.post(
-    '{}/set_webwork_password/{}'.format(API_URL, chat_id),
+    '{}/update_webwork_password/{}'.format(API_URL, chat_id),
     data=json.dumps(payload),
     headers=headers
   )
