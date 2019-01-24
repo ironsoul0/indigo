@@ -89,10 +89,9 @@ def set_username(bot, update, args):
       headers=headers
     )
     
-def check_new_webworks(bot, job):
+def check_new_webworks(bot, chat_id):
   #bot.send_message(chat_id=job.context, 
     #text='Nurda dalbaeb..')
-  chat_id = job.context
   headers = {
     'content-type': 'application/json; charset=utf-8'
   }
@@ -214,11 +213,25 @@ def notify_webwork(bot, update, job_queue):
         for webwork in webworks:
           bot.send_message(chat_id=update.message.chat_id, text='• {} - {}'.format(section, webwork))
       set_webworks_for_chat(update.message.chat_id, res)
-      print(job_check)
+      #print(job_check)
       
+
+def notifying_process(bot, job):
+  res = requests.get(
+    '{}/all_chats'.format(API_URL)
+  )
+  res = json.loads(res.text)
+  chats = res['chats']
+  for chat in chats:
+    print(chat)
+    if chat['notify_webworks']:
+      chat_id = chat['chat_id']
+      check_new_webworks(bot, chat_id)
 
 def main():
   u = Updater('703572266:AAEztdIDnTV6ka_3AZceqp1SjJDCDB3O2UU')
+  j = u.job_queue
+  j.run_repeating(notifying_process, interval=10, first=0)
   start_handler = CommandHandler('start', start)
   help_handler = CommandHandler('help', help)
   timer_handler = CommandHandler('timer', callback_timer, pass_job_queue=True)
