@@ -7,6 +7,7 @@ import webwork_login
 import api_calls
 import bot_messages
 import bot_token
+import registrar_login
 
 def unknown_command(bot, update):
   bot.send_message(
@@ -66,6 +67,14 @@ def set_webwork_password(bot, update, args):
     update.message.reply_text(bot_messages.updated_password_response)  
     api_calls.update_webwork_password(update.message.chat_id, new_password)
 
+def set_main_password(bot, update, args):
+  if len(args) == 0:
+    update.message.reply_text(bot_messages.empty_password_response)
+  else:
+    new_password = args[0]
+    update.message.reply_text(bot_messages.updated_password_response)  
+    api_calls.update_main_password(update.message.chat_id, new_password)
+
 def help(bot, update):
   update.message.reply_text(bot_messages.help_command_response)  
 
@@ -85,14 +94,53 @@ def notify_webwork(bot, update):
     current_webworks = webwork_login.get_webworks(chat_info['username'], chat_info['webwork_password'])
     if 'fail' in current_webworks:
       bot.send_message(chat_id=update.message.chat_id, 
-        text=bot_messages.wrong_data_response)
+        text=bot_messages.wrong_webwork_data_response)
     else:
       bot.send_message(chat_id=update.message.chat_id, text=bot_messages.successful_webwork_login_response)
       for section, webworks in current_webworks.items():
         for webwork in webworks:
           bot.send_message(chat_id=update.message.chat_id, text='• {} - {}'.format(section, webwork))
       set_webworks_for_chat(update.message.chat_id, current_webworks)      
+  
+def get_schedule(bot, update):
+  chat_info = api_calls.get_chat_info(update.message.chat_id)
+  if not 'main_password' in chat_info or not 'username' in chat_info:
+    update.message.reply_text(bot_messages.no_login_or_password_response)
+  else:
+    bot.send_message(chat_id=update.message.chat_id, 
+      text=bot_messages.checking_data_response)
+    schedule = registrar_login.get_schedule(chat_info['username'], chat_info['main_password'])
+    print(schedule)
+    if len(schedule.keys()) == 0:
+      bot.send_message(chat_id=update.message.chat_id, 
+        text=bot_messages.wrong_registrar_data_response)
+    else:
+      bot.send_message(chat_id=update.message.chat_id, text=bot_messages.successful_registrar_login_response)
+      api_calls.update_schedule_for_chat(update.message.chat_id, schedule)
 
+def show_schedule(bot, update):
+  chat_id = update.message.chat_id
+  chat_info = api_calls.get_chat_info(chat_id)
+  if not 'schedule' in chat_info:
+    bot.send_message(chat_id=chat_id, 
+      text=bot_messages.no_schedule_response)
+  else:
+    schedule = chat_info['schedule']
+    message = ''
+    for day, subjects in schedule.items():
+      message = message + '<b>{}</b>\n\n'.format(day)
+      if len(subjects) == 0:
+        message = message + 'No lectures this day ;)\n\n'
+      for subject in subjects:
+        message = message + '{}\n{} - {}\n{}\n'.format(
+          subject['course_name'], 
+          subject['start_time'], 
+          subject['end_time'], 
+          subject['lecture_room']
+        )
+        message = message + '\n'
+    bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
+      
 def notifying_process(bot, job):
   chats = api_calls.get_all_chats_info()
   for chat in chats:
@@ -109,16 +157,22 @@ def main():
   
   start_handler = CommandHandler('start', start)
   help_handler = CommandHandler('help', help)
+  get_schedule_handler = CommandHandler('get_schedule', get_schedule)
+  show_schedule_handler = CommandHandler('show_schedule', show_schedule)
   set_username_handler = CommandHandler('set_username', set_username, pass_args=True)
   set_webwork_password_handler = CommandHandler('set_webwork_password', set_webwork_password, pass_args=True)
+  set_main_password_handler = CommandHandler('set_main_password', set_main_password, pass_args=True)
   notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
   
   updater.dispatcher.add_handler(start_handler)
   updater.dispatcher.add_handler(set_username_handler)
   updater.dispatcher.add_handler(set_webwork_password_handler)
+  updater.dispatcher.add_handler(set_main_password_handler)
+  updater.dispatcher.add_handler(show_schedule_handler)
   updater.dispatcher.add_handler(help_handler)
   updater.dispatcher.add_handler(notify_webwork_handler)
+  updater.dispatcher.add_handler(get_schedule_handler)
   updater.dispatcher.add_handler(unknown_command_handler)
   updater.start_polling()
 

@@ -53,7 +53,7 @@ def get_schedule(username, password):
  
     trs = raw_schedule.find_all('tr')
 
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thurdsay', 'Friday', 'Saturday']
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
     index = 0
 
     schedule = {}

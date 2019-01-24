@@ -29,6 +29,19 @@ def update_webwork_password(chat_id, new_password):
     headers=headers
   )
 
+def update_main_password(chat_id, new_password):
+  payload = {
+    'main_password': new_password,
+  }
+  headers = {
+    'content-type': 'application/json; charset=utf-8'
+  }
+  requests.post(
+    '{}/update_main_password/{}'.format(API_URL, chat_id),
+    data=json.dumps(payload),
+    headers=headers
+  )
+
 def get_chat_info(chat_id):
   chat_info = requests.get(
     '{}/{}'.format(API_URL, chat_id)
@@ -51,6 +64,19 @@ def update_webworks_for_chat(chat_id, new_webworks):
   }
   requests.put(
     '{}/update_webworks/{}'.format(API_URL, chat_id),
+    data=json.dumps(payload),
+    headers=headers
+  )
+
+def update_schedule_for_chat(chat_id, new_schedule):
+  payload = {
+    'new_schedule': new_schedule
+  }
+  headers = {
+    'content-type': 'application/json; charset=utf-8'
+  }
+  requests.put(
+    '{}/update_schedule/{}'.format(API_URL, chat_id),
     data=json.dumps(payload),
     headers=headers
   )
