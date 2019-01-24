@@ -10,6 +10,7 @@ pylint = "*"
 requests = "*"
 python-telegram-bot = "*"
 bs4 = "*"
+pytz = "*"
 
 [requires]
 python_version = "3.7"

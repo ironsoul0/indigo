@@ -8,6 +8,7 @@ import api_calls
 import bot_messages
 import bot_token
 import registrar_login
+import time_helpers
 
 def unknown_command(bot, update):
   bot.send_message(
@@ -119,6 +120,7 @@ def get_schedule(bot, update):
       api_calls.update_schedule_for_chat(update.message.chat_id, schedule)
 
 def show_schedule(bot, update):
+  update.message.reply_text(bot_messages.wait_please_response)
   chat_id = update.message.chat_id
   chat_info = api_calls.get_chat_info(chat_id)
   if not 'schedule' in chat_info:
@@ -141,6 +143,47 @@ def show_schedule(bot, update):
         message = message + '\n'
     bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
       
+def next_lecture(bot, update):
+  chat_id = update.message.chat_id
+  chat_info = api_calls.get_chat_info(chat_id)
+  if not 'schedule' in chat_info:
+    bot.send_message(chat_id=chat_id, 
+      text=bot_messages.no_schedule_response)
+  else:
+    schedule = chat_info['schedule']
+    current_day = time_helpers.current_day()
+    if not current_day in schedule:
+      bot.send_message(chat_id=chat_id, 
+        text=bot_messages.no_lectures_today)
+      return 
+    current_time = time_helpers.current_time_in_minutes()
+    for subject in schedule[current_day]:
+      start_time = time_helpers.am_to_pm(subject['start_time'])
+      if start_time > current_time:
+        message = '{}\n{} - {}\n{}\n'.format(
+          subject['course_name'], 
+          subject['start_time'], 
+          subject['end_time'], 
+          subject['lecture_room']
+        ) 
+        bot.send_message(chat_id=chat_id,text=message)
+        return 
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    day_index = days.index(current_day)
+    for index in range(0, len(days)):
+      next_index = (day_index + index + 1) % 7
+      next_day = days[next_index]
+      for subject in schedule[next_day]:
+        start_time = time_helpers.am_to_pm(subject['start_time'])
+        message = '{}\n{} - {}\n{}\n'.format(
+          subject['course_name'], 
+          subject['start_time'], 
+          subject['end_time'], 
+          subject['lecture_room']
+        ) 
+        bot.send_message(chat_id=chat_id, text=message)
+        return
+
 def notifying_process(bot, job):
   chats = api_calls.get_all_chats_info()
   for chat in chats:
@@ -163,6 +206,7 @@ def main():
   set_webwork_password_handler = CommandHandler('set_webwork_password', set_webwork_password, pass_args=True)
   set_main_password_handler = CommandHandler('set_main_password', set_main_password, pass_args=True)
   notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
+  next_lecture_handler = CommandHandler('next_lecture', next_lecture)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
   
   updater.dispatcher.add_handler(start_handler)
@@ -173,7 +217,9 @@ def main():
   updater.dispatcher.add_handler(help_handler)
   updater.dispatcher.add_handler(notify_webwork_handler)
   updater.dispatcher.add_handler(get_schedule_handler)
+  updater.dispatcher.add_handler(next_lecture_handler)
   updater.dispatcher.add_handler(unknown_command_handler)
+  
   updater.start_polling()
 
 if __name__ == '__main__':
