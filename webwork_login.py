@@ -13,9 +13,9 @@ def login_to_course(url, login, passwd):
     for tr in trs:
       tds = tr.find_all('td')
       if len(tds) > 1:
-        if 'closed' in tds[2].text:
+        if 'closed' in tds[-1].text.lower():
           continue
-        result.append('{} - {}'.format(tds[1].text, tds[2].text)) 
+        result.append('{} - {}'.format(tds[1].text, tds[-1].text)) 
     return result
   else:
     raise("Couldn't login")
