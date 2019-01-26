@@ -19,7 +19,7 @@ empty_password_response = "Пароль не должен быть пустым 
 
 updated_password_response = "Замечательно, я обновил твой пароль!"
 
-new_webwork_reponse = "New webwork!\n"
+new_webwork_response = "New webwork!\n"
 
 unknown_command_response = "Прости, но я не знаю эту команду.\nВведи /help, чтобы увидеть список доступных команд."
 
@@ -34,13 +34,15 @@ help_command_response = "Доступные команды:" \
                         "\n" \
                         "4. /show_schedule - эта команда позволит тебе получать свое расписание в удобном формате" \
                         "\n" \
-                        "5. /next_lecture - если ты уже вызвал /get_schedule, эта команда будет сообщать тебе твою следующую лекцию" \
+                        "5. /notify_lectures <minutes> - укажи количество минут этой командой, и я буду оповещать тебя о лекциях, которые начнутся через это время" \
                         "\n" \
-                        "6. /set_webwork_password <your_password> - обычно пароль от webwork'ов это твой Student ID" \
+                        "6. /next_lecture - если ты уже вызвал /get_schedule, эта команда будет сообщать тебе твою следующую лекцию" \
                         "\n" \
-                        "7. /notify_webwork - если ты сообщил мне правильные данные, эта команда начнет оповещать тебя о новых webwork'ах в твоем аккаунте" \
+                        "7. /set_webwork_password <your_password> - обычно пароль от webwork'ов это твой Student ID" \
                         "\n" \
-                        "8. /help - показывает все доступные команды"
+                        "8. /notify_webwork - если ты сообщил мне правильные данные, эта команда начнет оповещать тебя о новых webwork'ах в твоем аккаунте" \
+                        "\n" \
+                        "9. /help - показывает все доступные команды"
 
 no_login_or_password_response = 'Пожалуйста укажи свой логин и пароль. \n \nВведи /help, если понадобится помощь.'
 
@@ -52,7 +54,7 @@ wrong_registrar_data_response = 'Похоже ты ввел неправильн
 
 successful_webwork_login_response = 'Отлично! Теперь я буду уведомлять тебя о новых вебворках.\nНа данный момент у тебя есть следующие вебворки:'
 
-successful_registrar_login_response = 'Круто! Я сохранил твое расписание, и теперь ты сможешь обращаться к нему в любой момент ^_^'
+successful_registrar_login_response = 'Круто! Я сохранил твое расписание, и теперь ты сможешь обращаться к нему в любой момент через команду /show_schedule ^_^'
 
 no_schedule_response = 'У меня нет твоего расписания :(\n\nНе забудь указать свои данные, а затем вызвать /get_schedule, чтобы я сохранил твое расписание.'
 
@@ -60,3 +62,8 @@ wait_please_response = 'Так-с, подожди пару секунд..'
 
 no_lectures_today = 'Сегодня больше нет лекций, ура! :)'
 
+no_notifying_minutes_response = 'Количество минут должно быть от 1 до 120!'
+
+notifying_minutes_not_number_response = 'Количество минут должно быть числом!'
+
+successful_notifying_minutes_update_response = 'Найс! Теперь ты никогда не будешь опаздывать на уроки.'

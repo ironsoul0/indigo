@@ -80,3 +80,16 @@ def update_schedule_for_chat(chat_id, new_schedule):
     data=json.dumps(payload),
     headers=headers
   )
+
+def update_schedule_notify_minutes(chat_id, new_minutes):
+  payload = {
+    'schedule_notify_minutes': new_minutes
+  }
+  headers = {
+    'content-type': 'application/json; charset=utf-8'
+  }
+  requests.post(
+    '{}/update_schedule_notify_minutes/{}'.format(API_URL, chat_id),
+    data=json.dumps(payload),
+    headers=headers
+  )
