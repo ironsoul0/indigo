@@ -1,4 +1,4 @@
-from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, ConversationHandler
+from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, ConversationHandler, RegexHandler
 from telegram import ForceReply
 from bs4 import BeautifulSoup
 import requests
@@ -24,13 +24,17 @@ def start(bot, update):
     text=bot_messages.start_command_response
   )
 
-def set_username(bot, update, args):
-  if len(args) == 0:
-    update.message.reply_text(bot_messages.empty_login_response)
-  else:
-    new_username = args[0]
-    update.message.reply_text(bot_messages.updated_login_response)  
-    api_calls.update_username(update.message.chat_id, new_username)
+def username_choice(bot, update):
+  new_username = update.message.text
+  update.message.reply_text(bot_messages.updated_login_response)  
+  api_calls.update_username(update.message.chat_id, new_username)
+  return ConversationHandler.END
+
+def set_username(bot, update):
+  update.message.reply_text(bot_messages.set_username_response, parse_mode='HTML')
+  return bot_states.USERNAME_CHOICE 
+
+
 
 def notify_about_new_webwork(bot, chat_id, course_name, new_webwork):
   bot.send_message(
@@ -61,22 +65,25 @@ def check_new_webworks(bot, chat_id):
         notify_about_new_webwork(bot, chat_id, course_name, new_webwork)
   set_webworks_for_chat(chat_id, current_webworks)
   
+def webwork_password_choice(bot, update):
+  new_password = update.message.text
+  update.message.reply_text(bot_messages.updated_password_response)  
+  api_calls.update_webwork_password(update.message.chat_id, new_password)
+  return ConversationHandler.END
 
-def set_webwork_password(bot, update, args):
-  if len(args) == 0:
-    update.message.reply_text(bot_messages.empty_password_response)
-  else:
-    new_password = args[0]
-    update.message.reply_text(bot_messages.updated_password_response)  
-    api_calls.update_webwork_password(update.message.chat_id, new_password)
+def set_webwork_password(bot, update):
+  update.message.reply_text(bot_messages.set_webwork_password_response, parse_mode='HTML')
+  return bot_states.WEBWORK_PASSWORD_CHOICE
 
-def set_main_password(bot, update, args):
-  if len(args) == 0:
-    update.message.reply_text(bot_messages.empty_password_response)
-  else:
-    new_password = args[0]
-    update.message.reply_text(bot_messages.updated_password_response)  
-    api_calls.update_main_password(update.message.chat_id, new_password)
+def main_password_choice(bot, update):
+  new_password = update.message.text
+  update.message.reply_text(bot_messages.updated_password_response)  
+  api_calls.update_main_password(update.message.chat_id, new_password)
+  return ConversationHandler.END
+
+def set_main_password(bot, update):
+  update.message.reply_text(bot_messages.set_main_password_response, parse_mode='HTML')
+  return bot_states.MAIN_PASSWORD_CHOICE
 
 def help(bot, update):
   update.message.reply_text(bot_messages.help_command_response)  
@@ -189,24 +196,27 @@ def next_lecture(bot, update):
         bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
         return
 
-def notify_lectures(bot, update, args):
+def notify_minutes_choice(bot, update):
   chat_id = update.message.chat_id
-  if len(args) == 0:
-    bot.send_message(chat_id=chat_id, text=bot_messages.no_notifying_minutes_response)
-    return
   try:
-    minutes = int(args[0])
+    minutes = int(update.message.text)
     if not (minutes > 0 and minutes <= 120):
       bot.send_message(chat_id=chat_id, text=bot_messages.no_notifying_minutes_response)
-      return
+      return ConversationHandler.END
     chat_info = api_calls.get_chat_info(chat_id)
     if not 'schedule' in chat_info:
       bot.send_message(chat_id=chat_id, text=bot_messages.no_schedule_response)
-      return
+      return ConversationHandler.END
     bot.send_message(chat_id=chat_id, text=bot_messages.successful_notifying_minutes_update_response)
     api_calls.update_schedule_notify_minutes(chat_id, minutes)
   except ValueError:
     bot.send_message(chat_id=chat_id, text=bot_messages.notifying_minutes_not_number_response)
+
+  return ConversationHandler.END
+
+def notify_lectures(bot, update):
+  update.message.reply_text(bot_messages.notify_lectures_response, parse_mode='HTML')
+  return bot_states.NOTIFY_MINUTES_CHOICE
 
 def notifying_webworks_process(bot, job):
   chats = api_calls.get_all_chats_info()
@@ -246,6 +256,9 @@ def notifying_lectures_process(bot, job):
         bot.send_message(chat_id=chat_id, text=message)
         return
 
+def done(bot, update):
+  print('ura!')
+  return ConversationHandler.END
 
 def main():
   updater = Updater(bot_token.secret_token)
@@ -258,16 +271,45 @@ def main():
   help_handler = CommandHandler('help', help)
   get_schedule_handler = CommandHandler('get_schedule', get_schedule)
   show_schedule_handler = CommandHandler('show_schedule', show_schedule)
-  set_username_handler = CommandHandler('set_username', set_username, pass_args=True)
-  set_webwork_password_handler = CommandHandler('set_webwork_password', set_webwork_password, pass_args=True)
-  set_main_password_handler = CommandHandler('set_main_password', set_main_password, pass_args=True)
   notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
   next_lecture_handler = CommandHandler('next_lecture', next_lecture)
-  notify_lectures_handler = CommandHandler('notify_lectures', notify_lectures, pass_args=True)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
   
-  updater.dispatcher.add_handler(start_handler)
+
+  set_username_handler = ConversationHandler(
+    entry_points=[CommandHandler('set_username', set_username)],
+    states={
+      bot_states.USERNAME_CHOICE: [MessageHandler(Filters.text, username_choice)]
+    },
+    fallbacks=[RegexHandler('[/]*', done)]
+  )
+
+  set_main_password_handler = ConversationHandler(
+    entry_points=[CommandHandler('set_main_password', set_main_password)],
+    states={
+      bot_states.MAIN_PASSWORD_CHOICE: [MessageHandler(Filters.text, main_password_choice)]
+    },
+    fallbacks=[RegexHandler('[/]*', done)]
+  )
+
+  set_webwork_password_handler = ConversationHandler(
+    entry_points=[CommandHandler('set_webwork_password', set_webwork_password)],
+    states={
+      bot_states.WEBWORK_PASSWORD_CHOICE: [MessageHandler(Filters.text, webwork_password_choice)]
+    },
+    fallbacks=[RegexHandler('[/]*', done)]
+  )
+
+  notify_lectures_handler = ConversationHandler(
+    entry_points=[CommandHandler('notify_lectures', notify_lectures)],
+    states={
+      bot_states.NOTIFY_MINUTES_CHOICE: [MessageHandler(Filters.text, notify_minutes_choice)]
+    },
+    fallbacks=[RegexHandler('[/]*', done)]
+  )
+
   updater.dispatcher.add_handler(set_username_handler)
+  updater.dispatcher.add_handler(start_handler)
   updater.dispatcher.add_handler(set_webwork_password_handler)
   updater.dispatcher.add_handler(set_main_password_handler)
   updater.dispatcher.add_handler(show_schedule_handler)

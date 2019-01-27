@@ -67,3 +67,11 @@ no_notifying_minutes_response = 'Количество минут должно б
 notifying_minutes_not_number_response = 'Количество минут должно быть числом!'
 
 successful_notifying_minutes_update_response = 'Найс! Теперь ты никогда не будешь опаздывать на уроки.'
+
+set_username_response = 'Хорошо, приятель, какой у тебя логин? Не забудь про формат <b>name.surname</b>'
+
+set_main_password_response = 'Ихихихи, мне нужен твой пароль, который ты используешь для входа в <b>registrar</b> и <b>moodle</b>. Обещаю его защищать :)'
+
+set_webwork_password_response = 'Ух-ух, введи пароль, который ты используешь для входа в <b>webwork</b>. Обычно это твой Student ID.'
+
+notify_lectures_response = 'Опаздываешь на лекции? Теперь не будешь :D\n\nВведи количество минут от 1 до 120, и я буду оповещать тебя о лекциях, когда до них останется количество минут, которое ты указал.'
