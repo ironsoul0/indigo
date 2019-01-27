@@ -203,10 +203,6 @@ def notify_minutes_choice(bot, update):
     if not (minutes > 0 and minutes <= 120):
       bot.send_message(chat_id=chat_id, text=bot_messages.no_notifying_minutes_response)
       return ConversationHandler.END
-    chat_info = api_calls.get_chat_info(chat_id)
-    if not 'schedule' in chat_info:
-      bot.send_message(chat_id=chat_id, text=bot_messages.no_schedule_response)
-      return ConversationHandler.END
     bot.send_message(chat_id=chat_id, text=bot_messages.successful_notifying_minutes_update_response)
     api_calls.update_schedule_notify_minutes(chat_id, minutes)
   except ValueError:
@@ -215,6 +211,11 @@ def notify_minutes_choice(bot, update):
   return ConversationHandler.END
 
 def notify_lectures(bot, update):
+  chat_id = update.message.chat_id
+  chat_info = api_calls.get_chat_info(chat_id)
+  if not 'schedule' in chat_info:
+    bot.send_message(chat_id=chat_id, text=bot_messages.no_schedule_response)
+    return ConversationHandler.END
   update.message.reply_text(bot_messages.notify_lectures_response, parse_mode='HTML')
   return bot_states.NOTIFY_MINUTES_CHOICE
 
@@ -257,7 +258,7 @@ def notifying_lectures_process(bot, job):
         return
 
 def done(bot, update):
-  print('ura!')
+  bot.send_message(chat_id=update.message.chat_id, text=bot_messages.going_to_another_command_response)
   return ConversationHandler.END
 
 def main():
