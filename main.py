@@ -1,4 +1,5 @@
 from telegram.ext import CommandHandler, MessageHandler, Filters, Updater
+import telegram
 from bs4 import BeautifulSoup
 import requests
 import json
