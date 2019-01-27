@@ -1,5 +1,5 @@
-from telegram.ext import CommandHandler, MessageHandler, Filters, Updater
-import telegram
+from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, ConversationHandler
+from telegram import ForceReply
 from bs4 import BeautifulSoup
 import requests
 import json
@@ -10,6 +10,7 @@ import bot_messages
 import bot_token
 import registrar_login
 import time_helpers
+import bot_states
 
 def unknown_command(bot, update):
   bot.send_message(
@@ -30,7 +31,7 @@ def set_username(bot, update, args):
     new_username = args[0]
     update.message.reply_text(bot_messages.updated_login_response)  
     api_calls.update_username(update.message.chat_id, new_username)
-    
+
 def notify_about_new_webwork(bot, chat_id, course_name, new_webwork):
   bot.send_message(
     chat_id=chat_id,
@@ -133,7 +134,7 @@ def show_schedule(bot, update):
     for day, subjects in schedule.items():
       message = message + '<b>{}</b>\n\n'.format(day)
       if len(subjects) == 0:
-        message = message + 'No lectures this day ;)\n\n'
+        message = message + bot_messages.no_lectures_this_day
       for subject in subjects:
         message = message + '{}\n{} - {}\n{}\n'.format(
           subject['course_name'], 

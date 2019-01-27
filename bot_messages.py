@@ -60,7 +60,7 @@ no_schedule_response = 'У меня нет твоего расписания :(\
 
 wait_please_response = 'Так-с, подожди пару секунд..'
 
-no_lectures_today = 'Сегодня больше нет лекций, ура! :)'
+no_lectures_this_day = 'Нет лекций, ура! :)\n\n'
 
 no_notifying_minutes_response = 'Количество минут должно быть от 1 до 120!'
 
