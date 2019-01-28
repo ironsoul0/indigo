@@ -34,8 +34,6 @@ def set_username(bot, update):
   update.message.reply_text(bot_messages.set_username_response, parse_mode='HTML')
   return bot_states.USERNAME_CHOICE 
 
-
-
 def notify_about_new_webwork(bot, chat_id, course_name, new_webwork):
   bot.send_message(
     chat_id=chat_id,
@@ -247,7 +245,7 @@ def notifying_lectures_process(bot, job):
           right_word = 'минуту'
         elif (notify_minutes % 10 > 1 and notify_minutes % 10 < 5):
           right_word = 'минуты'
-        message = 'Урок ровно через {} {}, не опоздай ;)\n\n'.format(notify_minutes, right_word)
+        message = 'Урок ровно через {} {}, не опоздай 😉\n\n'.format(notify_minutes, right_word)
         message = message + '{}\n{} - {}\n{}\n'.format(
           subject['course_name'], 
           subject['start_time'], 
@@ -265,7 +263,7 @@ def main():
   updater = Updater(bot_token.secret_token)
   
   job = updater.job_queue
-  job.run_repeating(notifying_webworks_process, interval=10, first=0)
+  job.run_repeating(notifying_webworks_process, interval=10000, first=10000)
   job.run_repeating(notifying_lectures_process, interval=60, first=0)
   
   start_handler = CommandHandler('start', start)
