@@ -53,6 +53,8 @@ successful_webwork_login_response = 'Отлично! Теперь я буду у
 
 successful_registrar_login_response = 'Круто! Я сохранил твое расписание, и теперь ты сможешь обращаться к нему в любой момент через команду /show_schedule ^_^'
 
+successful_moodle_login_response = 'Четко! Теперь я буду уведомлять тебя о новых оценках!'
+
 no_schedule_response = 'У меня нет твоего расписания :(\n\nНе забудь указать свои данные, а затем вызвать /get_schedule, чтобы я сохранил твое расписание.'
 
 wait_please_response = 'Так-с, подожди пару секунд..'

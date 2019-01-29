@@ -70,6 +70,3 @@ def get_grades(username, password):
 
   r.close()
   return courses
-
-
-print(get_grades('akezhan.rakishev', 'Mailru123!'))

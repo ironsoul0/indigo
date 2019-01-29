@@ -81,6 +81,19 @@ def update_schedule_for_chat(chat_id, new_schedule):
     headers=headers
   )
 
+def update_grades_for_chat(chat_id, new_grades):
+  payload = {
+    'new_grades': new_grades
+  }
+  headers = {
+    'content-type': 'application/json; charset=utf-8'
+  }
+  return requests.put(
+    '{}/update_grades/{}'.format(API_URL, chat_id),
+    data=json.dumps(payload),
+    headers=headers
+  )
+
 def update_schedule_notify_minutes(chat_id, new_minutes):
   payload = {
     'schedule_notify_minutes': new_minutes

@@ -80,5 +80,3 @@ def get_schedule(username, password):
         schedule[curDay].append(subject)
 
     return schedule
-
-print(get_schedule('temirzhan.yussupov', '515563515563a'))

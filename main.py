@@ -15,6 +15,7 @@ import bot_messages
 import registrar_login
 import time_helpers
 import bot_states
+import moodle_login
 
 def unknown_command(bot, update):
   bot.send_message(
@@ -114,6 +115,26 @@ def notify_webwork(bot, update):
           bot.send_message(chat_id=update.message.chat_id, text='• {} - {}'.format(section, webwork))
       set_webworks_for_chat(update.message.chat_id, current_webworks)      
   
+def notify_grades(bot, update):
+  chat_info = api_calls.get_chat_info(update.message.chat_id)
+  print(chat_info)
+  print('main_password' in chat_info)
+  if not 'main_password' in chat_info or not 'username' in chat_info:
+    update.message.reply_text(bot_messages.no_login_or_password_response)
+  else:
+    bot.send_message(chat_id=update.message.chat_id, 
+      text=bot_messages.checking_data_response)
+    current_grades = moodle_login.get_grades(chat_info['username'], chat_info['main_password'])
+    if len(current_grades.keys()) == 0:
+      bot.send_message(chat_id=update.message.chat_id, 
+        text=bot_messages.wrong_registrar_data_response)
+    else:
+      bot.send_message(chat_id=update.message.chat_id, text=bot_messages.successful_moodle_login_response)
+      set_grades_for_chat(update.message.chat_id, current_grades)
+      
+def set_grades_for_chat(chat_id, new_grades):
+  api_calls.update_grades_for_chat(chat_id, new_grades)
+
 def get_schedule(bot, update):
   chat_info = api_calls.get_chat_info(update.message.chat_id)
   if not 'main_password' in chat_info or not 'username' in chat_info:
@@ -259,26 +280,77 @@ def notifying_lectures_process(bot, job):
         bot.send_message(chat_id=chat_id, text=message)
         return
 
+def notifying_grades_process(bot, job):
+  print('lol')
+  chats = api_calls.get_all_chats_info()
+  for chat in chats:
+    if not 'notify_grades' in chat or not chat['notify_grades']:
+      continue
+    print('Notify_grades is in chat')
+    chat_id = chat['chat_id']
+    username = chat['username']
+    main_password = chat['main_password']
+    current_grades = moodle_login.get_grades(username, main_password)
+    old_grades = chat['grades']
+    print(current_grades)
+    current_grades['lol'] = []
+    current_grades['lol'].append({
+      'name': 'midterm',
+      'grade': '25',
+      'range': '0-100'
+    })
+    current_grades['Rhetoric and Composition-Lecture,Section-14-Spring 2019'].append({
+      'name': 'Final Paper',
+      'grade': '100%'
+    })
+    for course_name, course_grades in current_grades.items():
+      if not course_name in old_grades:
+        old_grades[course_name] = []
+      for course_grade in course_grades:
+        name = course_grade['name']
+        grade = course_grade['grade']
+        unique_grade = True
+        for old_grade in old_grades[course_name]:
+          old_name = old_grade['name']
+          old_grade = old_grade['grade']
+          if old_name == name and old_grade == grade:
+            unique_grade = False
+        if unique_grade:
+          bot.send_message(chat_id=chat_id, text='Новая оценка!\n\n')
+          info = '{} - <b>{}</b>\n'.format('Course name', course_name)
+          info += '{} - <b>{}</b>\n'.format('Grade name', name)
+          info += '{} - <b>{}</b>\n'.format('Grade', grade)
+          if 'range' in course_grade:
+            info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
+          if 'percentage' in course_grade:
+            info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])    
+          bot.send_message(chat_id=chat_id, text=info, parse_mode='HTML')
+    set_grades_for_chat(chat_id, current_grades)
+
 def done(bot, update):
   bot.send_message(chat_id=update.message.chat_id, text=bot_messages.going_to_another_command_response)
   return ConversationHandler.END
 
 def main():
   updater = None
+
   if 'BOT_TOKEN' in os.environ:
     updater = Updater(os.environ['BOT_TOKEN'])
   else:
     updater = Updater(bot_token.secret_token)
+
   job = updater.job_queue
   job.run_repeating(notifying_webworks_process, interval=10000, first=10000)
   job.run_repeating(notifying_lectures_process, interval=60, first=0)
-  
+  job.run_repeating(notifying_grades_process, interval=30, first=0)
+
   start_handler = CommandHandler('start', start)
   help_handler = CommandHandler('help', help)
   get_schedule_handler = CommandHandler('get_schedule', get_schedule)
   show_schedule_handler = CommandHandler('show_schedule', show_schedule)
   notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
   next_lecture_handler = CommandHandler('next_lecture', next_lecture)
+  notify_grades_handler = CommandHandler('notify_grades', notify_grades)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
   
 
@@ -324,6 +396,7 @@ def main():
   updater.dispatcher.add_handler(get_schedule_handler)
   updater.dispatcher.add_handler(next_lecture_handler)
   updater.dispatcher.add_handler(notify_lectures_handler)
+  updater.dispatcher.add_handler(notify_grades_handler)
   updater.dispatcher.add_handler(unknown_command_handler)
   
   updater.start_polling()
