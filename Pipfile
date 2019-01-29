@@ -11,7 +11,6 @@ requests = "*"
 python-telegram-bot = "*"
 bs4 = "*"
 pytz = "*"
-flask = "*"
 
 [requires]
 python_version = "3.7"
