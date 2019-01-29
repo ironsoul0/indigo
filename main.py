@@ -292,17 +292,6 @@ def notifying_grades_process(bot, job):
     main_password = chat['main_password']
     current_grades = moodle_login.get_grades(username, main_password)
     old_grades = chat['grades']
-    print(current_grades)
-    current_grades['lol'] = []
-    current_grades['lol'].append({
-      'name': 'midterm',
-      'grade': '25',
-      'range': '0-100'
-    })
-    current_grades['Rhetoric and Composition-Lecture,Section-14-Spring 2019'].append({
-      'name': 'Final Paper',
-      'grade': '100%'
-    })
     for course_name, course_grades in current_grades.items():
       if not course_name in old_grades:
         old_grades[course_name] = []
