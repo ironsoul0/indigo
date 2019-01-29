@@ -260,7 +260,7 @@ def done(bot, update):
   return ConversationHandler.END
 
 def main():
-  updater = Updater('703572266:AAEztdIDnTV6ka_3AZceqp1SjJDCDB3O2UU')
+  updater = Updater(bot_token.secret_token)
   
   job = updater.job_queue
   job.run_repeating(notifying_webworks_process, interval=10000, first=10000)
