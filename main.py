@@ -3,15 +3,15 @@ from telegram import ForceReply
 from bs4 import BeautifulSoup
 import requests
 import os
+
 try:
-  import json
+  import bot_token
 except ImportError:
   print(os.environ['BOT_TOKEN'])
 
 import webwork_login
 import api_calls
 import bot_messages
-import bot_token
 import registrar_login
 import time_helpers
 import bot_states
