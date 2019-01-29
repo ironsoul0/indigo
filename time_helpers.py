@@ -2,8 +2,9 @@ import datetime
 from datetime import datetime
 from pytz import timezone
 
+days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
 def current_day():
-  days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   return days[datetime.today().weekday()]
 
 def current_time_in_minutes():

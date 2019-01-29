@@ -175,7 +175,7 @@ def next_lecture(bot, update):
         ) 
         bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
         return 
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    days = time_helpers.days
     day_index = days.index(current_day)
     for index in range(0, len(days)):
       next_index = (day_index + index + 1) % 7
