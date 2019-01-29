@@ -281,7 +281,6 @@ def notifying_lectures_process(bot, job):
         return
 
 def notifying_grades_process(bot, job):
-  print('lol')
   chats = api_calls.get_all_chats_info()
   for chat in chats:
     if not 'notify_grades' in chat or not chat['notify_grades']:
