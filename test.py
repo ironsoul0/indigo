@@ -72,4 +72,4 @@ def loginToMoodle(username, password):
   return courses
 
 
-print(loginToMoodle('temirzhan.yussupov', '515563515563aA'))
+print(loginToMoodle('akezhan.rakishev', 'Mailru123!'))
