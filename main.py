@@ -261,8 +261,11 @@ def done(bot, update):
   return ConversationHandler.END
 
 def main():
-  updater = Updater(bot_token.secret_token)
-  
+  updater = None
+  if 'BOT_TOKEN' in os.environ:
+    updater = Updater(os.environ['BOT_TOKEN'])
+  else:
+    updater = Updater(bot_token.secret_token)
   job = updater.job_queue
   job.run_repeating(notifying_webworks_process, interval=10000, first=10000)
   job.run_repeating(notifying_lectures_process, interval=60, first=0)
