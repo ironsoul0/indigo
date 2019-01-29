@@ -2,8 +2,11 @@ from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, Conve
 from telegram import ForceReply
 from bs4 import BeautifulSoup
 import requests
-import json
 import os
+try:
+  import json
+except ImportError:
+  print(os.environ['BOT_TOKEN'])
 
 import webwork_login
 import api_calls
