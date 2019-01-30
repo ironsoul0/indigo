@@ -71,7 +71,7 @@ successful_notifying_minutes_update_response = 'Найс! Теперь ты ни
 
 set_username_response = 'Хорошо, приятель, какой у тебя логин? Не забудь про формат <b>name.surname</b>'
 
-set_main_password_response = 'Ихихихи, мне нужен твой пароль, который ты используешь для входа в <b>registrar</b> и <b>moodle</b>. Обещаю его защищать :)'
+set_main_password_response = 'Введи пароль, который ты используешь для входа в <b>registrar</b> и <b>moodle</b>. Все пароли надежно шифруются, поэтому можешь не беспокоится за их сохранность.'
 
 set_webwork_password_response = 'Ух-ух, введи пароль, который ты используешь для входа в <b>webwork</b>. Обычно это твой Student ID.'
 
