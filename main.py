@@ -20,7 +20,8 @@ import moodle_login
 def unknown_command(bot, update):
   bot.send_message(
     chat_id=update.message.chat_id, 
-    text=bot_messages.unknown_command_response
+    #text=bot_messages.unknown_command_response
+    text='Go prepare for midterm :D'
   )
 
 def start(bot, update):
@@ -323,7 +324,7 @@ def notify_users(bot):
   chats = api_calls.get_all_chats_info()
   for chat in chats:
     chat_id = chat['chat_id']
-    text = 'Привет! Если ты видишь это сообщение, то ты нашел этого бота раньше времени 😅\n\nКоманда Indigo просит Вас не распространять информацию об этом боте. Оффициальный анонс будет позже.\n\nСпасибо за понимание 😋'
+    text = 'Бот будет отключен до оффициального анонса. Подождите совсем немного, нам нужно написать мидки 😂'
     bot.send_message(chat_id=chat_id, text=text)
   
 def main():
@@ -383,6 +384,7 @@ def main():
     fallbacks=[RegexHandler('[/]*', done)]
   )
 
+  updater.dispatcher.add_handler(unknown_command_handler)
   updater.dispatcher.add_handler(set_username_handler)
   updater.dispatcher.add_handler(start_handler)
   updater.dispatcher.add_handler(set_webwork_password_handler)
@@ -394,7 +396,6 @@ def main():
   updater.dispatcher.add_handler(next_lecture_handler)
   updater.dispatcher.add_handler(notify_lectures_handler)
   updater.dispatcher.add_handler(notify_grades_handler)
-  updater.dispatcher.add_handler(unknown_command_handler)
   
   updater.start_polling()
 
