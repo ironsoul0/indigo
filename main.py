@@ -21,7 +21,7 @@ def unknown_command(bot, update):
   bot.send_message(
     chat_id=update.message.chat_id, 
     #text=bot_messages.unknown_command_response
-    text='Go prepare for midterm :D'
+    text='Бот будет отключен до оффициального анонса. Подождите совсем немного, нам нужно написать мидки 😂'
   )
 
 def start(bot, update):
@@ -326,7 +326,7 @@ def notify_users(bot):
     chat_id = chat['chat_id']
     text = 'Бот будет отключен до оффициального анонса. Подождите совсем немного, нам нужно написать мидки 😂'
     bot.send_message(chat_id=chat_id, text=text)
-  
+
 def main():
   updater = None
 
