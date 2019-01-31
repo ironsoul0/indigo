@@ -319,6 +319,13 @@ def done(bot, update):
   bot.send_message(chat_id=update.message.chat_id, text=bot_messages.going_to_another_command_response)
   return ConversationHandler.END
 
+def notify_users(bot):
+  chats = api_calls.get_all_chats_info()
+  for chat in chats:
+    chat_id = chat.chat_id
+    text = 'Привет! Если ты видишь это сообщение, то ты нашел этого бота раньше времени 😅\n\nКоманда Indigo просит Вас не распространять информацию об этом боте раньше времени. Оффициальный анонс будет позже.\n\nСпасибо за понимание 😋'
+    bot.send_message(chat_id=chat_id, text=text)
+  
 def main():
   updater = None
 
@@ -326,6 +333,8 @@ def main():
     updater = Updater(os.environ['BOT_TOKEN'])
   else:
     updater = Updater(bot_token.secret_token)
+
+  notify_users(updater.bot)
 
   job = updater.job_queue
   job.run_repeating(notifying_webworks_process, interval=10800, first=60)
