@@ -337,8 +337,8 @@ def main():
   get_schedule_handler = CommandHandler('get_schedule', get_schedule)
   show_schedule_handler = CommandHandler('show_schedule', show_schedule)
   notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
-  next_lecture_handler = CommandHandler('next_lecture', next_lecture)
   notify_grades_handler = CommandHandler('notify_grades', notify_grades)
+  next_lecture_handler = CommandHandler('next_lecture', next_lecture)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
   
 
