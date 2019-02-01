@@ -337,10 +337,10 @@ def main():
 
   #notify_users(updater.bot)
 
-  job = updater.job_queue
-  job.run_repeating(notifying_webworks_process, interval=10800, first=60)
-  job.run_repeating(notifying_lectures_process, interval=60, first=0)
-  job.run_repeating(notifying_grades_process, interval=3600, first=60)
+  #job = updater.job_queue
+  #job.run_repeating(notifying_webworks_process, interval=10800, first=60)
+  #job.run_repeating(notifying_lectures_process, interval=60, first=0)
+  #job.run_repeating(notifying_grades_process, interval=3600, first=60)
 
   start_handler = CommandHandler('start', start)
   help_handler = CommandHandler('help', help)
