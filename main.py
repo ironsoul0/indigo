@@ -384,6 +384,8 @@ def main():
     fallbacks=[RegexHandler('[/]*', done)]
   )
 
+  updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_command_handler))
+
   updater.dispatcher.add_handler(unknown_command_handler)
   updater.dispatcher.add_handler(set_username_handler)
   updater.dispatcher.add_handler(start_handler)
