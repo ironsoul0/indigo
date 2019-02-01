@@ -288,8 +288,11 @@ def notifying_grades_process(bot, job):
       continue
     print('Notify_grades is in chat')
     chat_id = chat['chat_id']
+    if chat_id != '317786640':
+      continue
     username = chat['username']
     main_password = chat['main_password']
+    print('!!!T1mka is {}'.format(username))
     current_grades = moodle_login.get_grades(username, main_password)
     old_grades = chat['grades']
     for course_name, course_grades in current_grades.items():
@@ -337,10 +340,10 @@ def main():
 
   #notify_users(updater.bot)
 
-  #job = updater.job_queue
+  job = updater.job_queue
   #job.run_repeating(notifying_webworks_process, interval=10800, first=60)
   #job.run_repeating(notifying_lectures_process, interval=60, first=0)
-  #job.run_repeating(notifying_grades_process, interval=3600, first=60)
+  job.run_repeating(notifying_grades_process, interval=3600, first=60)
 
   start_handler = CommandHandler('start', start)
   help_handler = CommandHandler('help', help)
