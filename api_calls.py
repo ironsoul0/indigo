@@ -1,5 +1,6 @@
 import requests
 import json
+import decrypter
 
 API_URL = 'https://nu-bot-backend.herokuapp.com/chat'
 
@@ -46,14 +47,18 @@ def get_chat_info(chat_id):
   chat_info = requests.get(
     '{}/{}'.format(API_URL, chat_id)
   )
-  return json.loads(chat_info.text)
+  chat_info = json.loads(chat_info.text)
+  return decrypter.process_chat(chat_info)
 
 def get_all_chats_info():
   result = requests.get(
     '{}/all_chats'.format(API_URL)
   )
   result = json.loads(result.text)
-  return result['chats']
+  chats = result['chats']
+  for i in range(0, len(chats)):
+    chats[i] = decrypter.process_chat(chats[i])
+  return chats
 
 def update_webworks_for_chat(chat_id, new_webworks):
   payload = {

@@ -20,8 +20,8 @@ import moodle_login
 def unknown_command(bot, update):
   bot.send_message(
     chat_id=update.message.chat_id, 
-    #text=bot_messages.unknown_command_response
-    text='Бот будет отключен до оффициального анонса. Подождите совсем немного, нам нужно написать мидки 😂'
+    text=bot_messages.unknown_command_response
+    #text='Бот будет отключен до оффициального анонса. Подождите совсем немного, нам нужно написать мидки 😂'
   )
 
 def start(bot, update):
@@ -323,13 +323,6 @@ def done(bot, update):
   bot.send_message(chat_id=update.message.chat_id, text=bot_messages.going_to_another_command_response)
   return ConversationHandler.END
 
-def notify_users(bot):
-  chats = api_calls.get_all_chats_info()
-  for chat in chats:
-    chat_id = chat['chat_id']
-    text = 'Бот будет отключен до оффициального анонса. Подождите совсем немного, нам нужно написать мидки 😂'
-    bot.send_message(chat_id=chat_id, text=text)
-
 def main():
   updater = None
 
@@ -338,11 +331,9 @@ def main():
   else:
     updater = Updater(bot_token.secret_token)
 
-  #notify_users(updater.bot)
-
   job = updater.job_queue
-  #job.run_repeating(notifying_webworks_process, interval=10800, first=60)
-  #job.run_repeating(notifying_lectures_process, interval=60, first=0)
+  job.run_repeating(notifying_webworks_process, interval=10800, first=60)
+  job.run_repeating(notifying_lectures_process, interval=60, first=0)
   job.run_repeating(notifying_grades_process, interval=3600, first=60)
 
   start_handler = CommandHandler('start', start)
@@ -387,9 +378,6 @@ def main():
     fallbacks=[RegexHandler('[/]*', done)]
   )
 
-  updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_command_handler))
-
-  updater.dispatcher.add_handler(unknown_command_handler)
   updater.dispatcher.add_handler(set_username_handler)
   updater.dispatcher.add_handler(start_handler)
   updater.dispatcher.add_handler(set_webwork_password_handler)
@@ -401,7 +389,8 @@ def main():
   updater.dispatcher.add_handler(next_lecture_handler)
   updater.dispatcher.add_handler(notify_lectures_handler)
   updater.dispatcher.add_handler(notify_grades_handler)
-  
+  updater.dispatcher.add_handler(unknown_command_handler)
+
   updater.start_polling()
 
 if __name__ == '__main__':
