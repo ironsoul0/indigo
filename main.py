@@ -294,12 +294,12 @@ def notifying_grades_process(bot, job):
       continue
     print('Notify_grades is in chat')
     chat_id = chat['chat_id']
-    if chat_id != '317786640':
-      continue
     username = chat['username']
     main_password = chat['main_password']
     print('!!!T1mka is {}'.format(username))
     current_grades = moodle_login.get_grades(username, main_password)
+    if len(current_grades.keys()) == 0:
+      continue
     old_grades = chat['grades']
     for course_name, course_grades in current_grades.items():
       if not course_name in old_grades:
