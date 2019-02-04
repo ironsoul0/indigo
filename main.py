@@ -230,10 +230,13 @@ def notify_minutes_choice(bot, update):
   chat_id = update.message.chat_id
   try:
     minutes = int(update.message.text)
-    if not (minutes > 0 and minutes <= 120):
+    if not (minutes >= 0 and minutes <= 120):
       send_message(bot, chat_id=chat_id, text=bot_messages.no_notifying_minutes_response)
       return ConversationHandler.END
-    send_message(bot, chat_id=chat_id, text=bot_messages.successful_notifying_minutes_update_response)
+    if minutes > 0:
+      send_message(bot, chat_id=chat_id, text=bot_messages.successful_notifying_minutes_update_response)
+    else:
+      send_message(bot, chat_id=chat_id, text=bot_messages.disable_notifying_minutes_response)
     api_calls.update_schedule_notify_minutes(chat_id, minutes)
   except ValueError:
     send_message(bot, chat_id=chat_id, text=bot_messages.notifying_minutes_not_number_response)
@@ -351,7 +354,7 @@ def main():
   job = updater.job_queue
   job.run_repeating(notifying_webworks_process, interval=10800, first=60)
   job.run_repeating(notifying_lectures_process, interval=60, first=0)
-  job.run_repeating(notifying_grades_process, interval=3600, first=60)
+  job.run_repeating(notifying_grades_process, interval=7200, first=28800)
 
   start_handler = CommandHandler('start', start)
   help_handler = CommandHandler('help', help)
