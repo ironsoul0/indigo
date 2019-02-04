@@ -346,7 +346,7 @@ def main():
   else:
     updater = Updater(bot_token.secret_token)
 
-  notify_users(updater.bot)
+  #notify_users(updater.bot)
 
   job = updater.job_queue
   job.run_repeating(notifying_webworks_process, interval=10800, first=60)
