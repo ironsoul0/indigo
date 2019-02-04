@@ -53,7 +53,7 @@ def get_grades(username, password):
       if len(column_grade.text) < 2: # case when '-' or ''
         continue
 
-      if 'Simple weighted mean of grades' in column_itemname.text:
+      if 'mean of grades' in column_itemname.text:
         continue
 
       if 'Attendance' in column_itemname.text:
