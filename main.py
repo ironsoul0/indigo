@@ -299,7 +299,7 @@ def notifying_lectures_process(bot):
     time.sleep(60)
 
 def notifying_grades_process(bot):
-  print('Grades go..')
+  print('Grades go')
   while True:
     chats = api_calls.get_all_chats_info()
     for chat in chats:
