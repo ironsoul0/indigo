@@ -367,8 +367,6 @@ def main():
   #job.run_repeating(notifying_webworks_process, interval=10800, first=3600)
   #job.run_repeating(notifying_grades_process, interval=7200, first=60)
 
-  threads = []
-
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
