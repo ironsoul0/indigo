@@ -4,6 +4,8 @@ from telegram.error import BadRequest
 from bs4 import BeautifulSoup
 import requests
 import os
+import threading
+import time
 
 try:
   import bot_token
@@ -252,82 +254,90 @@ def notify_lectures(bot, update):
   update.message.reply_text(bot_messages.notify_lectures_response, parse_mode='HTML')
   return bot_states.NOTIFY_MINUTES_CHOICE
 
-def notifying_webworks_process(bot, job):
-  chats = api_calls.get_all_chats_info()
-  for chat in chats:
-    print(chat)
-    if chat['notify_webworks']:
+def notifying_webworks_process(bot):
+  print('Webworks go..')
+  while True:
+    chats = api_calls.get_all_chats_info()
+    for chat in chats:
+      print(chat)
+      if chat['notify_webworks']:
+        chat_id = chat['chat_id']
+        check_new_webworks(bot, chat_id)
+    time.sleep(7200)
+
+def notifying_lectures_process(bot):
+  print('Lectures go..')
+  while True:
+    chats = api_calls.get_all_chats_info()
+    for chat in chats:
+      notify_minutes = chat['schedule_notify_minutes']
+      if notify_minutes == 0:
+        continue
       chat_id = chat['chat_id']
-      check_new_webworks(bot, chat_id)
+      schedule = chat['schedule']
+      print('Checking {}'.format(chat_id))
+      current_day = time_helpers.current_day()
+      current_minutes = time_helpers.current_time_in_minutes()
+      if not current_day in schedule:
+        continue 
+      for subject in schedule[current_day]:
+        subject_start_time = time_helpers.am_to_pm(subject['start_time'])
+        if subject_start_time - current_minutes == notify_minutes:
+          right_word = 'минут'
+          if (notify_minutes % 10 == 1):
+            right_word = 'минуту'
+          elif (notify_minutes % 10 > 1 and notify_minutes % 10 < 5):
+            right_word = 'минуты'
+          message = 'Урок ровно через {} {}, не опоздай 😉\n\n'.format(notify_minutes, right_word)
+          message = message + '{}\n{} - {}\n{}\n'.format(
+            subject['course_name'], 
+            subject['start_time'], 
+            subject['end_time'], 
+            subject['lecture_room']
+          ) 
+          send_message(bot, chat_id=chat_id, text=message)
+    time.sleep(60)
 
-def notifying_lectures_process(bot, job):
-  chats = api_calls.get_all_chats_info()
-  for chat in chats:
-    notify_minutes = chat['schedule_notify_minutes']
-    if notify_minutes == 0:
-      continue
-    chat_id = chat['chat_id']
-    schedule = chat['schedule']
-    print('Checking {}'.format(chat_id))
-    current_day = time_helpers.current_day()
-    current_minutes = time_helpers.current_time_in_minutes()
-    if not current_day in schedule:
-      continue 
-    for subject in schedule[current_day]:
-      subject_start_time = time_helpers.am_to_pm(subject['start_time'])
-      if subject_start_time - current_minutes == notify_minutes:
-        right_word = 'минут'
-        if (notify_minutes % 10 == 1):
-          right_word = 'минуту'
-        elif (notify_minutes % 10 > 1 and notify_minutes % 10 < 5):
-          right_word = 'минуты'
-        message = 'Урок ровно через {} {}, не опоздай 😉\n\n'.format(notify_minutes, right_word)
-        message = message + '{}\n{} - {}\n{}\n'.format(
-          subject['course_name'], 
-          subject['start_time'], 
-          subject['end_time'], 
-          subject['lecture_room']
-        ) 
-        send_message(bot, chat_id=chat_id, text=message)
-        return
-
-def notifying_grades_process(bot, job):
-  chats = api_calls.get_all_chats_info()
-  for chat in chats:
-    if not 'notify_grades' in chat or not chat['notify_grades']:
-      continue
-    print('Notify_grades is in chat')
-    chat_id = chat['chat_id']
-    username = chat['username']
-    main_password = chat['main_password']
-    print('!!!T1mka is {}'.format(username))
-    current_grades = moodle_login.get_grades(username, main_password)
-    if len(current_grades.keys()) == 0:
-      continue
-    old_grades = chat['grades']
-    for course_name, course_grades in current_grades.items():
-      if not course_name in old_grades:
-        old_grades[course_name] = []
-      for course_grade in course_grades:
-        name = course_grade['name']
-        grade = course_grade['grade']
-        unique_grade = True
-        for old_grade in old_grades[course_name]:
-          old_name = old_grade['name']
-          old_grade = old_grade['grade']
-          if old_name == name and old_grade == grade:
-            unique_grade = False
-        if unique_grade:
-          send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
-          info = '{} - <b>{}</b>\n'.format('Course name', course_name)
-          info += '{} - <b>{}</b>\n'.format('Grade name', name)
-          info += '{} - <b>{}</b>\n'.format('Grade', grade)
-          if 'range' in course_grade:
-            info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
-          if 'percentage' in course_grade:
-            info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])    
-          send_message(bot, chat_id=chat_id, text=info)
-    set_grades_for_chat(chat_id, current_grades)
+def notifying_grades_process(bot):
+  print('Grades go..')
+  while True:
+    chats = api_calls.get_all_chats_info()
+    for chat in chats:
+      if not 'notify_grades' in chat or not chat['notify_grades']:
+        continue
+      print('Notify_grades is in chat')
+      chat_id = chat['chat_id']
+      username = chat['username']
+      main_password = chat['main_password']
+      print('!!!T1mka is {}'.format(username))
+      current_grades = moodle_login.get_grades(username, main_password)
+      if len(current_grades.keys()) == 0:
+        continue
+      old_grades = chat['grades']
+      for course_name, course_grades in current_grades.items():
+        if not course_name in old_grades:
+          old_grades[course_name] = []
+        for course_grade in course_grades:
+          name = course_grade['name']
+          grade = course_grade['grade']
+          unique_grade = True
+          for old_grade in old_grades[course_name]:
+            old_name = old_grade['name']
+            old_grade = old_grade['grade']
+            if old_name == name and old_grade == grade:
+              unique_grade = False
+          if unique_grade:
+            send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
+            info = '{} - <b>{}</b>\n'.format('Course name', course_name)
+            info += '{} - <b>{}</b>\n'.format('Grade name', name)
+            info += '{} - <b>{}</b>\n'.format('Grade', grade)
+            if 'range' in course_grade:
+              info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
+            if 'percentage' in course_grade:
+              info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])    
+            send_message(bot, chat_id=chat_id, text=info)
+      set_grades_for_chat(chat_id, current_grades)
+    time.sleep(3600)
 
 def feedback(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.feedback_command_response)
@@ -352,10 +362,21 @@ def main():
 
   #notify_users(updater.bot)
 
-  job = updater.job_queue
-  job.run_repeating(notifying_lectures_process, interval=60, first=0)
-  job.run_repeating(notifying_webworks_process, interval=10800, first=3600)
-  job.run_repeating(notifying_grades_process, interval=7200, first=60)
+  #job = updater.job_queue
+  #job.run_repeating(notifying_lectures_process, interval=60, first=0)
+  #job.run_repeating(notifying_webworks_process, interval=10800, first=3600)
+  #job.run_repeating(notifying_grades_process, interval=7200, first=60)
+
+  threads = []
+
+  notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
+  notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
+  notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
+
+  threads = [notifying_lectures, notifying_webworks, notifying_grades]
+
+  for thread in threads:
+    thread.start()
 
   start_handler = CommandHandler('start', start)
   help_handler = CommandHandler('help', help)
