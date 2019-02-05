@@ -268,6 +268,7 @@ def notifying_lectures_process(bot, job):
       continue
     chat_id = chat['chat_id']
     schedule = chat['schedule']
+    print('Checking {}'.format(chat_id))
     current_day = time_helpers.current_day()
     current_minutes = time_helpers.current_time_in_minutes()
     if not current_day in schedule:
