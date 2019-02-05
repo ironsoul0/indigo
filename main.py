@@ -263,7 +263,7 @@ def notifying_webworks_process(bot):
       if chat['notify_webworks']:
         chat_id = chat['chat_id']
         check_new_webworks(bot, chat_id)
-    time.sleep(7200)
+    time.sleep(7300)
 
 def notifying_lectures_process(bot):
   print('Lectures go..')
