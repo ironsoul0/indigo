@@ -263,7 +263,7 @@ def notifying_webworks_process(bot):
       if chat['notify_webworks']:
         chat_id = chat['chat_id']
         check_new_webworks(bot, chat_id)
-    time.sleep(7300)
+    time.sleep(18000)
 
 def notifying_lectures_process(bot):
   print('Lectures go..')
@@ -288,7 +288,9 @@ def notifying_lectures_process(bot):
             right_word = 'минуту'
           elif (notify_minutes % 10 > 1 and notify_minutes % 10 < 5):
             right_word = 'минуты'
-          message = 'Урок ровно через {} {}, не опоздай 😉\n\n'.format(notify_minutes, right_word)
+          if notify_minutes % 100 > 10 and notify_minutes % 100 < 20:
+            right_word = 'минут'
+          message = 'Урок ровно через <b>{} {}</b>, не опоздай 😉\n\n'.format(notify_minutes, right_word)
           message = message + '{}\n{} - {}\n{}\n'.format(
             subject['course_name'], 
             subject['start_time'], 
