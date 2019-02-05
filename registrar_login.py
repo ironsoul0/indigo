@@ -50,25 +50,30 @@ def get_schedule(username, password):
     }
     text = r.get(r'https://registrar.nu.edu.kz/my-registrar/personal-schedule/json?method=drawStudentSchedule', headers=headersGet)
     raw_schedule = BeautifulSoup(text.text.replace('\r', '').replace('\n', '').replace('\\', '').replace('rn', ''), 'html.parser')
- 
-    trs = raw_schedule.find_all('tr')
+        
+    #print(raw_schedule)
 
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-    index = 0
+    grades_table = raw_schedule.find('div', class_='student_class_schedule_reports')
+    
+    if grades_table is None:
+        return {}
+    
+    trs = grades_table.find_all('tr')
 
     schedule = {}
-    curDay = days[0]
+    curDay = None
 
-    for j in range(2, len(trs)):
+    for j in range(1, len(trs)):
         tr = trs[j]
         tds = tr.find_all('td')    
         cur = []
         for i in range(0, len(tds) - 5):
             cur.append(tds[i].text.strip())
-        if (len(cur) == 0):
-            index += 1
-            curDay = days[index]
+        if len(cur) == 0:
+            curDay = tds[0].text.strip()
+            print(curDay)
             continue
+        print(cur)
         subject = {
             'start_time': cur[0],
             'end_time': cur[1],
