@@ -33,7 +33,7 @@ def get_grades(username, password):
     #print(course_name)
 
     #if '2018' in course_name: # because we currently have 2019 year
-    #continue
+    #  continue
 
     courses[course_name] = []
     
