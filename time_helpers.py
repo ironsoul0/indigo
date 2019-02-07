@@ -5,8 +5,9 @@ from pytz import timezone
 days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 def current_day():
-  return days[datetime.today().weekday()]
-
+  now_utc = datetime.now(timezone('Asia/Almaty'))
+  return days[now_utc.weekday()]
+  
 def current_time_in_minutes():
   now_utc = datetime.now(timezone('Asia/Almaty'))
   hours = now_utc.strftime('%H')
