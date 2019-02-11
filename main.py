@@ -304,6 +304,7 @@ def notifying_grades_process(bot):
       chat_id = chat['chat_id']
       username = chat['username']
       main_password = chat['main_password']
+      print('Checking {} grades..'.format(username))
       current_grades = moodle_login.get_grades(username, main_password)
       if len(current_grades.keys()) == 0:
         continue
