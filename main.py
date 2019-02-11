@@ -333,7 +333,7 @@ def notifying_grades_process(bot):
             print('{} got a new grade'.format(username))
             print('{} - {} - {}'.format(course_name, name, grade))
       set_grades_for_chat(chat_id, current_grades)
-    time.sleep(3600)
+    time.sleep(600)
 
 def feedback(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.feedback_command_response)
