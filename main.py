@@ -39,7 +39,7 @@ def start(bot, update):
   )
 
 def username_choice(bot, update):
-  new_username = update.message.text
+  new_username = update.message.text.lower()
   print('{} wants to join Indigo community'.format(new_username))
   update.message.reply_text(bot_messages.updated_login_response)  
   api_calls.update_username(update.message.chat_id, new_username)
