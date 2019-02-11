@@ -23,7 +23,7 @@ import moodle_login
 def send_message(bot, chat_id, text):
   try:
     bot.send_message(chat_id=chat_id, text=text, parse_mode='HTML')
-  except BadRequest:
+  except:
     print('No such chat_id using a bot')
 
 def unknown_command(bot, update):
