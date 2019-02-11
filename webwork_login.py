@@ -21,7 +21,6 @@ def login_to_course(url, login, passwd):
     raise("Couldn't login")
 
 def get_webworks(login, passwd):
-    print(login, passwd)
     url = "http://webwork.sst.nu.edu.kz/"
     pageText = requests.get(url).text
     loginLinkPat = re.compile(r'<a href="/(.+?)/">(.+?)</a>')
@@ -42,5 +41,3 @@ def get_webworks(login, passwd):
     if cnt == 0:
       return {'fail': [ ]}
     return courses
-  
-print(get_webworks('temirzhan.yussupov', '201747150'))

@@ -16,8 +16,6 @@ def get_schedule(username, password):
     formMatch = formIdReg.finditer(html)
     for match in formMatch:
         formBuildId = match.group(1)
-    print('token is ' + csrfToken)
-    print('form id ' + formBuildId)
     headersPost = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:63.0) Gecko/20100101 Firefox/63.0',
                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                    "Accept-Language": "en-US,en;q=0.5",
@@ -32,10 +30,6 @@ def get_schedule(username, password):
  
     r.post(url + '/index.php?q=user/login', headers=headersPost, data=data)
     lol = r.post(url + '/index.php?q=user/login', headers=headersPost, data=data)
- 
- 
-    print(lol.status_code)
- 
  
     headersGet = {
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:63.0) Gecko/20100101 Firefox/63.0',
@@ -71,9 +65,7 @@ def get_schedule(username, password):
             cur.append(tds[i].text.strip())
         if len(cur) == 0:
             curDay = tds[0].text.strip()
-            print(curDay)
             continue
-        print(cur)
         subject = {
             'start_time': cur[0],
             'end_time': cur[1],
