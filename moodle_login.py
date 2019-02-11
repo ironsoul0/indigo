@@ -58,7 +58,7 @@ def get_grades(username, password):
       if 'course total' in column_itemname.text.lower():
         continue
 
-      if 'Attendance' in column_itemname.text:
+      if 'attendance' in column_itemname.text.lower():
         continue
       
       grade_item = {}

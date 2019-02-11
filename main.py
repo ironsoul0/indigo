@@ -256,7 +256,7 @@ def notifying_webworks_process(bot):
       if chat['notify_webworks']:
         chat_id = chat['chat_id']
         check_new_webworks(bot, chat_id)
-    time.sleep(18000)
+    time.sleep(7200)
 
 def notifying_lectures_process(bot):
   print('Starting to notify about upcoming lectures..')
@@ -334,7 +334,6 @@ def notifying_grades_process(bot):
             print('{} got a new grade'.format(username))
             print('{} - {} - {}'.format(course_name, name, grade))
       set_grades_for_chat(chat_id, current_grades)
-    time.sleep(600)
 
 def feedback(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.feedback_command_response)
@@ -347,7 +346,7 @@ def notify_users(bot):
   chats = api_calls.get_all_chats_info()
   for chat in chats:
     chat_id = chat['chat_id']
-    send_message(bot, chat_id=chat_id, text='Нам уже сообщили об одном баге.\n\nБаг исправлен и бот перезапущен, всем спасибо! 😝')
+    send_message(bot, chat_id=chat_id, text='Всем привет!\n\nКому-то пришли оценки с очень большой задержкой во времени, а кому-то не пришли вообще 😓. Мы исправили баг и сейчас все должно быть нормально. Спасибо, что используете Indigo ❤️')
 
 def main():
   updater = None
@@ -356,6 +355,8 @@ def main():
     updater = Updater(os.environ['BOT_TOKEN'])
   else:
     updater = Updater(bot_token.secret_token)
+
+  notify_users(updater.bot)
 
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
