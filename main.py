@@ -356,7 +356,7 @@ def main():
   else:
     updater = Updater(bot_token.secret_token)
 
-  notify_users(updater.bot)
+  #notify_users(updater.bot)
 
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
