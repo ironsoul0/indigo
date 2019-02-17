@@ -321,7 +321,7 @@ def notifying_grades_process(bot):
             old_grade = old_grade['grade']
             if old_name == name and old_grade == grade:
               unique_grade = False
-          if not unique_grade and course_name.lower() != 'error' and name.lower() != 'error':
+          if unique_grade and course_name.lower() != 'error' and name.lower() != 'error':
             send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
             info = '{} - <b>{}</b>\n'.format('Course name', course_name)
             info += '{} - <b>{}</b>\n'.format('Grade name', name)
