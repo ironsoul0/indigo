@@ -321,14 +321,14 @@ def notifying_grades_process(bot):
             old_grade = old_grade['grade']
             if old_name == name and old_grade == grade:
               unique_grade = False
-          if unique_grade:
+          if not unique_grade and course_name.lower() != 'error' and name.lower() != 'error':
             send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
             info = '{} - <b>{}</b>\n'.format('Course name', course_name)
             info += '{} - <b>{}</b>\n'.format('Grade name', name)
             info += '{} - <b>{}</b>\n'.format('Grade', grade)
-            if 'range' in course_grade:
+            if 'range' in course_grade and course_grade['range'].lower() != 'error':
               info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
-            if 'percentage' in course_grade:
+            if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
               info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])    
             send_message(bot, chat_id=chat_id, text=info)
             print('{} got a new grade'.format(username))
