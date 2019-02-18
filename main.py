@@ -295,45 +295,52 @@ def notifying_lectures_process(bot):
 def notifying_grades_process(bot):
   rep = 0
   while True:
-    rep += 1
-    print('Starting to check for new grades.. {}'.format(rep))
-    chats = api_calls.get_all_chats_info()
-    for chat in chats:
-      if not 'notify_grades' in chat or not chat['notify_grades']:
-        continue
-      chat_id = chat['chat_id']
-      username = chat['username']
-      main_password = chat['main_password']
-      print('Checking {} grades..'.format(username))
-      current_grades = moodle_login.get_grades(username, main_password)
-      if len(current_grades.keys()) == 0:
-        continue
-      old_grades = chat['grades']
-      for course_name, course_grades in current_grades.items():
-        if not course_name in old_grades:
-          old_grades[course_name] = []
-        for course_grade in course_grades:
-          name = course_grade['name']
-          grade = course_grade['grade']
-          unique_grade = True
-          for old_grade in old_grades[course_name]:
-            old_name = old_grade['name']
-            old_grade = old_grade['grade']
-            if old_name == name and old_grade == grade:
-              unique_grade = False
-          if unique_grade and course_name.lower() != 'error' and name.lower() != 'error':
-            send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
-            info = '{} - <b>{}</b>\n'.format('Course name', course_name)
-            info += '{} - <b>{}</b>\n'.format('Grade name', name)
-            info += '{} - <b>{}</b>\n'.format('Grade', grade)
-            if 'range' in course_grade and course_grade['range'].lower() != 'error':
-              info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
-            if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
-              info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])    
-            send_message(bot, chat_id=chat_id, text=info)
-            print('{} got a new grade'.format(username))
-            print('{} - {} - {}'.format(course_name, name, grade))
-      set_grades_for_chat(chat_id, current_grades)
+    try:
+      rep += 1
+      print('Starting to check for new grades.. {}'.format(rep))
+      chats = api_calls.get_all_chats_info()
+      total_number = len(chats)
+      current_number = 0
+      for chat in chats:
+        current_number += 1
+        if not 'notify_grades' in chat or not chat['notify_grades']:
+          continue
+        chat_id = chat['chat_id']
+        username = chat['username']
+        main_password = chat['main_password']
+        print('Checking {} grades.. {}/{}'.format(username, current_number, total_number))
+        current_grades = moodle_login.get_grades(username, main_password)
+        if len(current_grades.keys()) == 0:
+          continue
+        old_grades = chat['grades']
+        for course_name, course_grades in current_grades.items():
+          if not course_name in old_grades:
+            old_grades[course_name] = []
+          for course_grade in course_grades:
+            name = course_grade['name']
+            grade = course_grade['grade']
+            unique_grade = True
+            for old_grade in old_grades[course_name]:
+              old_name = old_grade['name']
+              old_grade = old_grade['grade']
+              if old_name == name and old_grade == grade:
+                unique_grade = False
+            if unique_grade and course_name.lower() != 'error' and name.lower() != 'error':
+              send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
+              info = '{} - <b>{}</b>\n'.format('Course name', course_name)
+              info += '{} - <b>{}</b>\n'.format('Grade name', name)
+              info += '{} - <b>{}</b>\n'.format('Grade', grade)
+              if 'range' in course_grade and course_grade['range'].lower() != 'error':
+                info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
+              if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
+                info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])    
+              send_message(bot, chat_id=chat_id, text=info)
+              print('{} got a new grade'.format(username))
+              print('{} - {} - {}'.format(course_name, name, grade))
+        set_grades_for_chat(chat_id, current_grades)
+    except:
+      print('Exception occured but still running..')
+      pass
 
 def feedback(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.feedback_command_response)
@@ -348,6 +355,12 @@ def notify_users(bot):
     chat_id = chat['chat_id']
     send_message(bot, chat_id=chat_id, text='Всем привет!\n\nКому-то пришли оценки с очень большой задержкой во времени, а кому-то не пришли вообще 😓. Мы исправили баг и сейчас все должно быть нормально. Спасибо, что используете Indigo ❤️')
 
+def log_text(bot, update):
+  chat_id = update.message.chat_id
+  chat_info = api_calls.get_chat_info(chat_id)
+  if 'username' in chat_info:
+    print('{} wrote {} to Indigo'.format(chat_info['username'], update.message.text))  
+
 def main():
   updater = None
 
@@ -361,7 +374,6 @@ def main():
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
-
   threads = [notifying_lectures, notifying_webworks, notifying_grades]
 
   for thread in threads:
@@ -375,6 +387,7 @@ def main():
   notify_grades_handler = CommandHandler('notify_grades', notify_grades)
   next_lecture_handler = CommandHandler('next_lecture', next_lecture)
   feedback_handler = CommandHandler('feedback', feedback)
+  any_message_handler = MessageHandler(Filters.text, log_text)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
   
 
@@ -423,6 +436,7 @@ def main():
   updater.dispatcher.add_handler(notify_grades_handler)
   updater.dispatcher.add_handler(notify_grades_handler)
   updater.dispatcher.add_handler(feedback_handler)
+  updater.dispatcher.add_handler(any_message_handler)
   updater.dispatcher.add_handler(unknown_command_handler)
 
   updater.start_polling()
