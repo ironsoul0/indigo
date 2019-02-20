@@ -295,16 +295,16 @@ def notifying_lectures_process(bot):
 def notifying_grades_process(bot):
   rep = 0
   while True:
-    try:
-      rep += 1
-      print('Starting to check for new grades.. {}'.format(rep))
-      chats = api_calls.get_all_chats_info()
-      total_number = len(chats)
-      current_number = 0
-      for chat in chats:
-        current_number += 1
-        if not 'notify_grades' in chat or not chat['notify_grades']:
-          continue
+    rep += 1
+    print('Starting to check for new grades.. {}'.format(rep))
+    chats = api_calls.get_all_chats_info()
+    total_number = len(chats)
+    current_number = 0
+    for chat in chats:
+      current_number += 1
+      if not 'notify_grades' in chat or not chat['notify_grades']:
+        continue
+      try:
         chat_id = chat['chat_id']
         username = chat['username']
         main_password = chat['main_password']
@@ -340,9 +340,10 @@ def notifying_grades_process(bot):
               print('{} got a new grade'.format(username))
               print('{} - {} - {}'.format(course_name, name, grade))
         set_grades_for_chat(chat_id, current_grades)
-    except:
-      print('Exception occured but still running..')
-      pass
+      except:
+        print('Exception occured but still running..')
+        pass
+    
 
 def feedback(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.feedback_command_response)
