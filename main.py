@@ -311,6 +311,8 @@ def notifying_grades_process(bot):
         print('Checking {} grades.. {}/{}'.format(username, current_number, total_number))
         current_grades = moodle_login.get_grades(username, main_password)
         if len(current_grades.keys()) == 0:
+          send_message(bot, chat_id=chat_id, text=bot_messages.password_changed_response)
+          api_calls.disable_notify_grades_for_chat(chat_id)
           continue
         old_grades = chat['grades']
         for course_name, course_grades in current_grades.items():

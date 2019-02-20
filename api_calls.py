@@ -86,6 +86,11 @@ def update_schedule_for_chat(chat_id, new_schedule):
     headers=headers
   )
 
+def disable_notify_grades_for_chat(chat_id):
+  return requests.put(
+    '{}/disable_notify_grades/{}'.format(API_URL, chat_id)
+  )
+
 def update_grades_for_chat(chat_id, new_grades):
   payload = {
     'new_grades': new_grades
