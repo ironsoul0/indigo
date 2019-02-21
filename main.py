@@ -356,7 +356,8 @@ def notify_users(bot):
   chats = api_calls.get_all_chats_info()
   for chat in chats:
     chat_id = chat['chat_id']
-    send_message(bot, chat_id=chat_id, text='Всем привет!\n\nКому-то пришли оценки с очень большой задержкой во времени, а кому-то не пришли вообще 😓. Мы исправили баг и сейчас все должно быть нормально. Спасибо, что используете Indigo ❤️')
+    send_message(bot, chat_id=chat_id, text='К Indigo присоединилось уже более 200 человек! 🔥\n\nВсем спасибо! 😻')
+  print('Done!')
 
 def log_text(bot, update):
   chat_id = update.message.chat_id
@@ -372,12 +373,13 @@ def main():
   else:
     updater = Updater(bot_token.secret_token)
 
-  #notify_users(updater.bot)
+  notify_users(updater.bot)
 
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
   threads = [notifying_lectures, notifying_webworks, notifying_grades]
+  threads = []
 
   for thread in threads:
     thread.start()
