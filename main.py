@@ -254,9 +254,13 @@ def notifying_webworks_process(bot):
     chats = api_calls.get_all_chats_info()
     for chat in chats:
       if chat['notify_webworks']:
-        chat_id = chat['chat_id']
-        check_new_webworks(bot, chat_id)
-    time.sleep(7200)
+        try:
+          chat_id = chat['chat_id']
+          check_new_webworks(bot, chat_id)
+        except:
+          print('Webworks exception occured but still running..')
+          pass
+    time.sleep(14400)
 
 def notifying_lectures_process(bot):
   print('Starting to notify about upcoming lectures..')
@@ -341,7 +345,7 @@ def notifying_grades_process(bot):
               print('{} - {} - {}'.format(course_name, name, grade))
         set_grades_for_chat(chat_id, current_grades)
       except:
-        print('Exception occured but still running..')
+        print('Grades exception occured but still running..')
         pass
     
 
