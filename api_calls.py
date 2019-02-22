@@ -2,7 +2,7 @@ import requests
 import json
 import decrypter
 
-API_URL = 'https://nu-bot-backend.herokuapp.com/chat'
+API_URL = 'https://indigo-backend.herokuapp.com/chat'
 
 def update_username(chat_id, new_username):
   payload = {

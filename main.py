@@ -366,6 +366,8 @@ def log_text(bot, update):
     print('{} wrote {} to Indigo'.format(chat_info['username'], update.message.text))  
 
 def main():
+  return
+  
   updater = None
 
   if 'BOT_TOKEN' in os.environ:
