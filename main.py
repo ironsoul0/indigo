@@ -265,6 +265,8 @@ def notifying_webworks_process(bot):
 def notifying_lectures_process(bot):
   print('Starting to notify about upcoming lectures..')
   while True:
+    if time_helpers.current_time_in_minutes() >= 120 and time_helpers.current_time_in_minutes() <= 420:
+      continue
     chats = api_calls.get_all_chats_info()
     for chat in chats:
       notify_minutes = chat['schedule_notify_minutes']
@@ -299,6 +301,8 @@ def notifying_lectures_process(bot):
 def notifying_grades_process(bot):
   rep = 0
   while True:
+    if time_helpers.current_time_in_minutes() >= 120 and time_helpers.current_time_in_minutes() <= 420:
+      continue
     rep += 1
     print('Starting to check for new grades.. {}'.format(rep))
     chats = api_calls.get_all_chats_info()
