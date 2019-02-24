@@ -78,5 +78,3 @@ def get_grades(username, password):
 
   r.close()
   return courses
-  
-print(get_grades('temirzhan.yussupov', '515563515563aA'))
