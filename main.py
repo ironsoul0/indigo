@@ -144,14 +144,17 @@ def get_schedule(bot, update):
   else:
     send_message(bot, chat_id=update.message.chat_id, 
       text=bot_messages.checking_data_response)
-    schedule = registrar_login.get_schedule(chat_info['username'], chat_info['main_password'])
-    print('{} used /get_schedule command'.format(chat_info['username']))
-    if len(schedule.keys()) == 0:
-      send_message(bot, chat_id=update.message.chat_id, 
-        text=bot_messages.wrong_registrar_data_response)
-    else:
-      send_message(bot, chat_id=update.message.chat_id, text=bot_messages.successful_registrar_login_response)
-      api_calls.update_schedule_for_chat(update.message.chat_id, schedule)
+    try:
+      schedule = registrar_login.get_schedule(chat_info['username'], chat_info['main_password'])
+      print('{} used /get_schedule command'.format(chat_info['username']))
+      if len(schedule.keys()) == 0:
+        send_message(bot, chat_id=update.message.chat_id, 
+          text=bot_messages.wrong_registrar_data_response)
+      else:
+        send_message(bot, chat_id=update.message.chat_id, text=bot_messages.successful_registrar_login_response)
+        api_calls.update_schedule_for_chat(update.message.chat_id, schedule)
+    except:
+      print('Schedule error....')
 
 def show_schedule(bot, update):
   update.message.reply_text(bot_messages.wait_please_response)
