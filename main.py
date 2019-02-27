@@ -360,7 +360,7 @@ def feedback(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.feedback_command_response)
 
 def done(bot, update):
-  send_message(bot, chat_id=update.message.chat_id, text=bot_messages.going_to_another_command_response)
+  send_message(bot, chat_id=update.message.chat_id, text=bot_messages.command_cancel_response)
   return ConversationHandler.END
 
 def notify_users(bot):
