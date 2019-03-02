@@ -12,6 +12,6 @@
 
 ## ✨ Features
 
-- Notifications about new grades**
-- Notifications about new webworks**
-- Reminds of upcoming lectures**
+- Notifications about new grades
+- Notifications about new webworks
+- Reminds of upcoming lectures
