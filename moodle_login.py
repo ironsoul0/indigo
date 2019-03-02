@@ -29,18 +29,9 @@ def get_grades(username, password):
     soup = BeautifulSoup(html_doc, 'html.parser')
 
     tr_itemnames = soup.find_all('tr')
-
-    #print(course_name)
-
-    #if '2018' in course_name: # because we currently have 2019 year
-    #  continue
-
     courses[course_name] = []
     
     for item_tr in tr_itemnames:
-      
-      #print(item_th.text)
-      
       column_itemname = item_tr.find('th', class_='column-itemname')
       column_grade = item_tr.find('td', class_='column-grade')
       column_range = item_tr.find('td', class_='column-range')
@@ -51,29 +42,22 @@ def get_grades(username, password):
 
       if len(column_grade.text) < 2: # case when '-' or ''
         continue
-
       if 'mean of grades' in column_itemname.text.lower():
         continue
-
       if 'среднее взвешенное' in column_itemname.text.lower():
-        continue  
-
+        continue 
       if 'course total' in column_itemname.text.lower():
         continue
-
       if 'attendance' in column_itemname.text.lower():
         continue
       
       grade_item = {}
-
       grade_item['name'] = column_itemname.text
       grade_item['grade'] = column_grade.text
-      
       if not column_range is None and len(column_range.text) > 1:
         grade_item['range'] = column_range.text
       if not column_percentage is None and len(column_percentage.text) > 1:
         grade_item['percentage'] = column_percentage.text
-        
       courses[course_name].append(grade_item)
 
   r.close()

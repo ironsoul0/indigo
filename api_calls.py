@@ -1,8 +1,16 @@
 import requests
 import json
 import decrypter
+import os
 
-API_URL = 'https://indigo-backend.herokuapp.com/chat'
+API_URL = ''
+
+try:
+  import sensitive
+  API_URL = sensitive.API_URL
+except ImportError:
+  API_URL = os.environ['API_URL']
+  print(API_URL)
 
 def update_username(chat_id, new_username):
   payload = {

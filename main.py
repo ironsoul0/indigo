@@ -8,7 +8,7 @@ import threading
 import time
 
 try:
-  import bot_token
+  import sensitive
 except ImportError:
   print(os.environ['BOT_TOKEN'])
 
@@ -382,7 +382,7 @@ def main():
   if 'BOT_TOKEN' in os.environ:
     updater = Updater(os.environ['BOT_TOKEN'])
   else:
-    updater = Updater(bot_token.secret_token)
+    updater = Updater(sensitive.secret_token)
 
   #notify_users(updater.bot)
 
@@ -390,6 +390,7 @@ def main():
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
   threads = [notifying_lectures, notifying_webworks, notifying_grades]
+  threads = []
 
   for thread in threads:
     thread.start()
@@ -405,7 +406,6 @@ def main():
   any_message_handler = MessageHandler(Filters.text, log_text)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
   
-
   set_username_handler = ConversationHandler(
     entry_points=[CommandHandler('set_username', set_username)],
     states={
