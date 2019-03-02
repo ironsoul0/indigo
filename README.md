@@ -7,7 +7,7 @@
 <h1 align="center">Indigo</h1>
 
 <div align="center">
-  Telegram bot that makes life in NU easier. 
+  Telegram bot that makes life in NU easier
 </div>
 
 ## ✨ Features
