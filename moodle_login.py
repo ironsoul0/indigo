@@ -30,7 +30,6 @@ def get_grades(username, password):
 
     tr_itemnames = soup.find_all('tr')
     courses[course_name] = []
-    
     for item_tr in tr_itemnames:
       column_itemname = item_tr.find('th', class_='column-itemname')
       column_grade = item_tr.find('td', class_='column-grade')

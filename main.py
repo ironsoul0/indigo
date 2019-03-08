@@ -367,7 +367,7 @@ def notify_users(bot):
   chats = api_calls.get_all_chats_info()
   for chat in chats:
     chat_id = chat['chat_id']
-    send_message(bot, chat_id=chat_id, text='К Indigo присоединилось уже более 200 человек! 🔥\n\nВсем спасибо! 😻')
+    send_message(bot, chat_id=chat_id, text='Дорогие девушки, поздравляем вас с этим замечательным днем! Будьте счастливы и оставайтесь всегда такими же красивыми 😍')
   print('Done!')
 
 def log_text(bot, update):
@@ -389,7 +389,8 @@ def main():
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
-  threads = [notifying_lectures, notifying_webworks, notifying_grades]
+  threads = [notifying_webworks, notifying_grades]
+  #threads = []
 
   for thread in threads:
     thread.start()
