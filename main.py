@@ -19,6 +19,7 @@ import registrar_login
 import time_helpers
 import bot_states
 import moodle_login
+import mynuedu
 
 def send_message(bot, chat_id, text):
   try:
@@ -376,6 +377,16 @@ def log_text(bot, update):
   if 'username' in chat_info:
     print('{} wrote {} to Indigo'.format(chat_info['username'], update.message.text))  
 
+def congrat_girls(bot):
+  girls = mynuedu.get_girls()
+  #girls = [('Анелия', '317786640')]
+  for girl in girls:
+    name = girl[0]
+    chat_id = girl[1]
+    message = '<b>Дорогая {}</b>,\n\nМы искренне поздравляем тебя с этим замечательным днем! Оставайся всегда такой же красивой и милой. Никогда не унывай и помни, что жизнь прекрасна ✨😍💋'.format(name)
+    print('Sending to {} - {}'.format(name, chat_id))
+    send_message(bot, chat_id, message)
+
 def main():
   updater = None
 
@@ -385,12 +396,13 @@ def main():
     updater = Updater(sensitive.secret_token)
 
   #notify_users(updater.bot)
+  congrat_girls(updater.bot)
 
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
   threads = [notifying_webworks, notifying_grades]
-  #threads = []
+  threads = []
 
   for thread in threads:
     thread.start()
