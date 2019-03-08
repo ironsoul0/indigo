@@ -254,6 +254,8 @@ def notify_lectures(bot, update):
 
 def notifying_webworks_process(bot):
   while True:
+    if time_helpers.current_time_in_minutes() >= 0 and time_helpers.current_time_in_minutes() <= 719:
+      continue
     print('Starting to notify about new webworks..')
     chats = api_calls.get_all_chats_info()
     for chat in chats:
@@ -269,7 +271,7 @@ def notifying_webworks_process(bot):
 def notifying_lectures_process(bot):
   print('Starting to notify about upcoming lectures..')
   while True:
-    if time_helpers.current_time_in_minutes() >= 0 and time_helpers.current_time_in_minutes() <= 420:
+    if time_helpers.current_time_in_minutes() >= 0 and time_helpers.current_time_in_minutes() <= 719:
       continue
     chats = api_calls.get_all_chats_info()
     for chat in chats:
@@ -305,7 +307,7 @@ def notifying_lectures_process(bot):
 def notifying_grades_process(bot):
   rep = 0
   while True:
-    if time_helpers.current_time_in_minutes() >= 0 and time_helpers.current_time_in_minutes() <= 420:
+    if time_helpers.current_time_in_minutes() >= 0 and time_helpers.current_time_in_minutes() <= 719:
       continue
     rep += 1
     print('Starting to check for new grades.. {}'.format(rep))
@@ -390,7 +392,7 @@ def main():
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
-  threads = [notifying_webworks, notifying_grades]
+  threads = [notifying_lectures, notifying_webworks, notifying_grades]
 
   for thread in threads:
     thread.start()
