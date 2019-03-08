@@ -379,7 +379,6 @@ def log_text(bot, update):
 
 def congrat_girls(bot):
   girls = mynuedu.get_girls()
-  #girls = [('Анелия', '317786640')]
   for girl in girls:
     name = girl[0]
     chat_id = girl[1]
