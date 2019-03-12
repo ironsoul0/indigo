@@ -4,26 +4,30 @@ import re
 from bs4 import BeautifulSoup
 import requests 
 
+userName = 'temirzhan.yussupov'
+fixedLen = 6
+variants = ['D', 'C', 'N']
+questionUrl = 'http://webwork.sst.nu.edu.kz/webwork2/MATH-162-1L-Calc-II-Spring19/HW8/3/'
+
 def brute(r, cur = []):
-  if len(cur) == 5:
-    print(cur)
+  if len(cur) == fixedLen:
     payload = {
-      'user': 'almat.sergazyyev',
-      'effectiveUser': 'almat.sergazyyev',
+      'user': userName,
+      'effectiveUser': userName,
       'templateName': 'system',
-      'AnSwEr0001': cur[0],
-      'AnSwEr0002': cur[1],
-      'AnSwEr0003': cur[2],
-      'AnSwEr0004': cur[3],
-      'AnSwEr0005': cur[4],
       'submitAnswers': 'Submit Answers',
       'showOldAnswers': '1',
       'displayMode': 'MathJax'
     }
-    r.post('http://webwork.sst.nu.edu.kz/webwork2/MATH-162-1L-Calc-II-Spring19/HW7/3/', data=payload)
+    for i in range(fixedLen):
+      answer_str = 'AnSwEr000{}'.format(i + 1)
+      payload[answer_str] = cur[i]
+    #print(payload)
+    res = r.post(questionUrl, data=payload)
+    if not 'NO' in res.text:
+      print(cur)
   else:
-    ans = ['NA', 'CONV', 'DIV']
-    for x in ans:
+    for x in variants:
       new_cur = cur.copy()
       new_cur.append(x)
       brute(r, new_cur)
@@ -35,9 +39,7 @@ def solve(user, passwd):
       'user': user,
       'passwd': passwd
   }
-  content = r.post(url, data=payload)
-  url = 'http://webwork.sst.nu.edu.kz/webwork2/MATH-162-1L-Calc-II-Spring19/HW7/3/'
-  cur = []
+  r.post(url, data=payload)
   brute(r)
 
-solve('almat.sergazyyev', '201711726')
+solve(userName, '201747150')
