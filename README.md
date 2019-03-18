@@ -16,12 +16,6 @@
 - Notifications about new webworks
 - Reminds of upcoming lectures
 
-## ✨ Features
-
-- Notifications about new grades
-- Notifications about new webworks
-- Reminds of upcoming lectures
-
 ## 💻 Stack
 
 - [python-telegram-bot](https://python-telegram-bot.org/)
