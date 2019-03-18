@@ -4,10 +4,10 @@ import re
 from bs4 import BeautifulSoup
 import requests 
 
-userName = 'temirzhan.yussupov'
-fixedLen = 6
-variants = ['D', 'C', 'N']
-questionUrl = 'http://webwork.sst.nu.edu.kz/webwork2/MATH-162-1L-Calc-II-Spring19/HW8/3/'
+userName = 'madi.raissov'
+fixedLen = 5
+variants = ['CONV', 'DIV', 'NA']
+questionUrl = 'http://webwork.sst.nu.edu.kz/webwork2/MATH-162-1L-Calc-II-Spring19/HW7/3/'
 
 def brute(r, cur = []):
   if len(cur) == fixedLen:
@@ -42,4 +42,4 @@ def solve(user, passwd):
   r.post(url, data=payload)
   brute(r)
 
-solve(userName, '201747150')
+solve(userName, '201717112')
