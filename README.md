@@ -15,3 +15,9 @@
 - Notifications about new grades
 - Notifications about new webworks
 - Reminds of upcoming lectures
+
+## 💻 Stack
+
+- [python-telegram-bot](https://python-telegram-bot.org/)
+- Backend on [NodeJS](https://nodejs.org/en/)
+- [MongoDB](https://mlab.com/) database
