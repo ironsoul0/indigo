@@ -371,7 +371,6 @@ def notify_users(bot):
   for chat in chats:
     chat_id = chat['chat_id']
     send_message(bot, chat_id=chat_id, text='Дорогие девушки, поздравляем вас с этим замечательным днем! Будьте счастливы и оставайтесь всегда такими же красивыми 😍')
-  print('Done!')
 
 def log_text(bot, update):
   chat_id = update.message.chat_id
