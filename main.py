@@ -418,7 +418,6 @@ def main():
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
   threads = [notifying_lectures, notifying_webworks, notifying_grades]
   threads = [notifying_webworks, notifying_grades]
-  threads = []
 
   for thread in threads:
     thread.start()
