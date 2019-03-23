@@ -27,6 +27,12 @@ def send_message(bot, chat_id, text):
   except:
     print('No such chat_id using a bot')
 
+def send_sticker(bot, chat_id, sticker_id):
+  try:
+    bot.send_sticker(chat_id=chat_id, sticker=sticker_id)
+  except:
+    print('No such chat_id using a bot')
+
 def unknown_command(bot, update):
   send_message(bot, 
     chat_id=update.message.chat_id, 
@@ -342,7 +348,7 @@ def notifying_grades_process(bot):
               if old_name == name and old_grade == grade:
                 unique_grade = False
             if unique_grade and course_name.lower() != 'error' and name.lower() != 'error' and grade.lower() != 'error':
-              send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
+              send_message(bot, chat_id=chat_id, text='Бро, у тебя новая оценка!\n\n')
               info = '{} - <b>{}</b>\n'.format('Course name', course_name)
               info += '{} - <b>{}</b>\n'.format('Grade name', name)
               info += '{} - <b>{}</b>\n'.format('Grade', grade)
@@ -351,6 +357,8 @@ def notifying_grades_process(bot):
               if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
                 info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])    
               send_message(bot, chat_id=chat_id, text=info)
+              if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
+                check_excellence(bot, chat_id, course_grade['percentage'])
               print('{} got a new grade'.format(username))
               print('{} - {} - {}'.format(course_name, name, grade))
         set_grades_for_chat(chat_id, current_grades)
@@ -358,6 +366,18 @@ def notifying_grades_process(bot):
         print('Grades exception occured but still running..')
         pass
     
+def check_excellence(bot, chat_id, percentage):
+  valid_percent = percentage[:-2]
+  try:
+    int_percent = int(float(valid_percent))
+    if int_percent == 100:
+      send_message(bot, chat_id, bot_messages.full_grade)
+      send_sticker(bot, chat_id, 'CAADBQADWQMAAukKyAMKKaSA3iagGgI')
+    elif int_percent > 90:
+      send_message(bot, chat_id, bot_messages.almost_full_grade)
+      send_sticker(bot, chat_id, 'CAADBQAEAwAC6QrIA4GkHRvuSRcMAg')
+  except ValueError:
+    pass
 
 def feedback(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.feedback_command_response)
@@ -370,7 +390,11 @@ def notify_users(bot):
   chats = api_calls.get_all_chats_info()
   for chat in chats:
     chat_id = chat['chat_id']
-    send_message(bot, chat_id=chat_id, text='Дорогие девушки, поздравляем вас с этим замечательным днем! Будьте счастливы и оставайтесь всегда такими же красивыми 😍')
+    try:
+      bot.send_sticker(chat_id=chat_id, sticker='CAADBQADWQMAAukKyAMKKaSA3iagGgI')
+    except:
+      pass
+    #send_message(bot, chat_id=chat_id, text='Дорогие девушки, поздравляем вас с этим замечательным днем! Будьте счастливы и оставайтесь всегда такими же красивыми 😍')
 
 def log_text(bot, update):
   chat_id = update.message.chat_id
@@ -387,12 +411,14 @@ def main():
     updater = Updater(sensitive.secret_token)
 
   #notify_users(updater.bot)
+  #check_excellence(updater.bot, sensitive.PERSON_ID, '100.00 %')
 
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
   threads = [notifying_lectures, notifying_webworks, notifying_grades]
   threads = [notifying_webworks, notifying_grades]
+  threads = []
 
   for thread in threads:
     thread.start()
