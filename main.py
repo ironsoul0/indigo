@@ -380,6 +380,10 @@ def check_excellence(bot, chat_id, percentage):
     pass
 
 def feedback(bot, update):
+  chat_id = update.message.chat_id
+  chat_info = api_calls.get_chat_info(chat_id)
+  if 'username' in chat_info:
+    print('{} used /feedback command'.format(chat_info['username']))
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.feedback_command_response)
 
 def done(bot, update):
