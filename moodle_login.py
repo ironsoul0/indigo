@@ -49,7 +49,7 @@ def get_grades(username, password):
         continue
       if 'attendance' in column_itemname.text.lower():
         continue
-      if 'қатысу' in column_itemname.text.lower():
+      if 'қатыс' in column_itemname.text.lower():
         continue
       
       grade_item = {}
