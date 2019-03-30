@@ -21,6 +21,9 @@ import bot_states
 import moodle_login
 import mynuedu
 
+from telegram import ReplyKeyboardMarkup, KeyboardButton
+
+
 def send_message(bot, chat_id, text):
   try:
     bot.send_message(chat_id=chat_id, text=text, parse_mode='HTML')
@@ -406,6 +409,43 @@ def log_text(bot, update):
   if 'username' in chat_info:
     print('{} wrote {} to Indigo'.format(chat_info['username'], update.message.text))  
 
+def enter_chat(bot, update):
+  chat_id = update.message.chat_id
+  chat_info = api_calls.get_chat_info(chat_id)
+  if not 'notify_grades' in chat_info or not chat_info['notify_grades']:
+    send_message(bot, update.message.chat_id, bot_messages.reject_chat_response)
+    return ConversationHandler.END
+  send_message(bot, update.message.chat_id, bot_messages.choose_chat_username)
+  return bot_states.CHAT_USERNAME_CHOICE
+
+def chat_username_choice(bot, update, user_data):
+  text = update.message.text 
+  if len(text) > 10 or len(text) < 4:
+    send_message(bot, update.message.chat_id, bot_messages.too_long_username_response)
+    return bot_states.CHAT_USERNAME_CHOICE
+  user_data['username'] = text
+  api_calls.toggle_room_participant(update.message.chat_id)
+  menu_keyboard = [[KeyboardButton('/quit')]]
+  menu_markup = ReplyKeyboardMarkup(menu_keyboard, one_time_keyboard=True, resize_keyboard=True)
+  bot.send_message(chat_id=update.message.chat_id, text=bot_messages.welcome_chat_response, reply_markup=menu_markup, parse_mode='HTML')
+  return bot_states.CHAT_MESSAGE_CHOICE
+
+def chat_message_choice(bot, update, user_data):
+  text = update.message.text 
+  cur_username = user_data['username']
+  room_ids = api_calls.get_room_participants()
+  for room_id in room_ids:
+    if room_id == str(update.message.chat_id):
+      continue
+    current_message = '<b>{}</b>\n\n{}'.format(cur_username, text)
+    send_message(bot, room_id, current_message)
+  return bot_states.CHAT_MESSAGE_CHOICE
+
+def quit_chat(bot, update):
+  api_calls.toggle_room_participant(update.message.chat_id)
+  send_message(bot, update.message.chat_id, bot_messages.chat_quitted)
+  return ConversationHandler.END
+
 def main():
   updater = None
 
@@ -421,7 +461,8 @@ def main():
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
   threads = [notifying_lectures, notifying_webworks, notifying_grades]
-  
+  threads = []
+
   for thread in threads:
     thread.start()
 
@@ -468,6 +509,15 @@ def main():
     fallbacks=[RegexHandler('[/]*', done)]
   )
 
+  enter_chat_handler = ConversationHandler(
+    entry_points=[CommandHandler('enter_chat', enter_chat)],
+    states={
+      bot_states.CHAT_USERNAME_CHOICE: [MessageHandler(Filters.text, chat_username_choice, pass_user_data=True)],
+      bot_states.CHAT_MESSAGE_CHOICE: [MessageHandler(Filters.text, chat_message_choice, pass_user_data=True)],
+    },
+    fallbacks=[RegexHandler('[/]*', quit_chat)]
+  )
+
   updater.dispatcher.add_handler(set_username_handler)
   updater.dispatcher.add_handler(start_handler)
   updater.dispatcher.add_handler(set_webwork_password_handler)
@@ -481,6 +531,7 @@ def main():
   updater.dispatcher.add_handler(notify_grades_handler)
   updater.dispatcher.add_handler(notify_grades_handler)
   updater.dispatcher.add_handler(feedback_handler)
+  updater.dispatcher.add_handler(enter_chat_handler)
   updater.dispatcher.add_handler(any_message_handler)
   updater.dispatcher.add_handler(unknown_command_handler)
 

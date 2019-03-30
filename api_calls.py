@@ -20,7 +20,7 @@ def update_username(chat_id, new_username):
     'content-type': 'application/json; charset=utf-8'
   }
   requests.post(
-    '{}/update_username/{}'.format(API_URL, chat_id),
+    '{}/chat/update_username/{}'.format(API_URL, chat_id),
     data=json.dumps(payload),
     headers=headers
   )
@@ -33,7 +33,7 @@ def update_webwork_password(chat_id, new_password):
     'content-type': 'application/json; charset=utf-8'
   }
   requests.post(
-    '{}/update_webwork_password/{}'.format(API_URL, chat_id),
+    '{}/chat/update_webwork_password/{}'.format(API_URL, chat_id),
     data=json.dumps(payload),
     headers=headers
   )
@@ -46,21 +46,21 @@ def update_main_password(chat_id, new_password):
     'content-type': 'application/json; charset=utf-8'
   }
   requests.post(
-    '{}/update_main_password/{}'.format(API_URL, chat_id),
+    '{}/chat/update_main_password/{}'.format(API_URL, chat_id),
     data=json.dumps(payload),
     headers=headers
   )
 
 def get_chat_info(chat_id):
   chat_info = requests.get(
-    '{}/{}'.format(API_URL, chat_id)
+    '{}/chat/{}'.format(API_URL, chat_id)
   )
   chat_info = json.loads(chat_info.text)
   return decrypter.process_chat(chat_info)
 
 def get_all_chats_info():
   result = requests.get(
-    '{}/all_chats'.format(API_URL)
+    '{}/chat/all_chats'.format(API_URL)
   )
   result = json.loads(result.text)
   chats = result['chats']
@@ -76,7 +76,7 @@ def update_webworks_for_chat(chat_id, new_webworks):
     'content-type': 'application/json; charset=utf-8'
   }
   requests.put(
-    '{}/update_webworks/{}'.format(API_URL, chat_id),
+    '{}/chat/update_webworks/{}'.format(API_URL, chat_id),
     data=json.dumps(payload),
     headers=headers
   )
@@ -89,14 +89,14 @@ def update_schedule_for_chat(chat_id, new_schedule):
     'content-type': 'application/json; charset=utf-8'
   }
   requests.put(
-    '{}/update_schedule/{}'.format(API_URL, chat_id),
+    '{}/chat/update_schedule/{}'.format(API_URL, chat_id),
     data=json.dumps(payload),
     headers=headers
   )
 
 def disable_notify_grades_for_chat(chat_id):
   return requests.put(
-    '{}/disable_notify_grades/{}'.format(API_URL, chat_id)
+    '{}/chat/disable_notify_grades/{}'.format(API_URL, chat_id)
   )
 
 def update_grades_for_chat(chat_id, new_grades):
@@ -107,7 +107,7 @@ def update_grades_for_chat(chat_id, new_grades):
     'content-type': 'application/json; charset=utf-8'
   }
   return requests.put(
-    '{}/update_grades/{}'.format(API_URL, chat_id),
+    '{}/chat/update_grades/{}'.format(API_URL, chat_id),
     data=json.dumps(payload),
     headers=headers
   )
@@ -120,7 +120,36 @@ def update_schedule_notify_minutes(chat_id, new_minutes):
     'content-type': 'application/json; charset=utf-8'
   }
   requests.post(
-    '{}/update_schedule_notify_minutes/{}'.format(API_URL, chat_id),
+    '{}/chat/update_schedule_notify_minutes/{}'.format(API_URL, chat_id),
+    data=json.dumps(payload),
+    headers=headers
+  )
+
+def get_room_participants(room_id="5c9f1ba989811004cdb5014c"):
+  payload = {
+    'room_id': room_id
+  }
+  headers = {
+    'content-type': 'application/json; charset=utf-8'
+  }
+  result = requests.get(
+    '{}/room/get_participants'.format(API_URL),
+    data=json.dumps(payload),
+    headers=headers
+  )
+  result = json.loads(result.text)
+  return result['participants']
+
+def toggle_room_participant(chat_id, room_id="5c9f1ba989811004cdb5014c"):
+  payload = {
+    'chat_id': chat_id,
+    'room_id': room_id
+  }
+  headers = {
+    'content-type': 'application/json; charset=utf-8'
+  }
+  requests.post(
+    '{}/room/toggle_participant'.format(API_URL),
     data=json.dumps(payload),
     headers=headers
   )

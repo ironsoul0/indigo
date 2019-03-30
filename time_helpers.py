@@ -23,5 +23,3 @@ def am_to_pm(current_time):
     if (hours < 12):
       hours += 12
     return hours * 60 + minutes
-
-print(current_time_in_minutes())
