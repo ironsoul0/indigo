@@ -429,7 +429,6 @@ def chat_username_choice(bot, update, user_data):
 
 def chat_message_choice(bot, update, user_data):
   text = update.message.text 
-  print(text)
   cur_username = user_data['username']
   room_ids = api_calls.get_room_participants()
   for room_id in room_ids:
@@ -472,7 +471,7 @@ def main():
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
-  threads = [notifying_lectures, notifying_webworks, notifying_grades]
+  threads = [notifying_lectures, notifying_webworks, notifying_grades] if 'INDIGO_PROD' in os.environ else []
 
   for thread in threads:
     thread.start()
