@@ -376,9 +376,6 @@ def check_excellence(bot, chat_id, percentage):
     if int_percent == 100:
       send_message(bot, chat_id, bot_messages.full_grade)
       send_sticker(bot, chat_id, 'CAADBQADWQMAAukKyAMKKaSA3iagGgI')
-    elif int_percent > 90:
-      send_message(bot, chat_id, bot_messages.almost_full_grade)
-      send_sticker(bot, chat_id, 'CAADBQAEAwAC6QrIA4GkHRvuSRcMAg')
   except ValueError:
     pass
 
@@ -419,8 +416,8 @@ def enter_chat(bot, update):
   return bot_states.CHAT_USERNAME_CHOICE
 
 def chat_username_choice(bot, update, user_data):
-  text = update.message.text 
-  if len(text) > 10 or len(text) < 4:
+  text = update.message.text
+  if len(text) > 10 or len(text) < 3:
     send_message(bot, update.message.chat_id, bot_messages.too_long_username_response)
     return bot_states.CHAT_USERNAME_CHOICE
   user_data['username'] = text
@@ -432,6 +429,7 @@ def chat_username_choice(bot, update, user_data):
 
 def chat_message_choice(bot, update, user_data):
   text = update.message.text 
+  print(text)
   cur_username = user_data['username']
   room_ids = api_calls.get_room_participants()
   for room_id in room_ids:
@@ -441,9 +439,23 @@ def chat_message_choice(bot, update, user_data):
     send_message(bot, room_id, current_message)
   return bot_states.CHAT_MESSAGE_CHOICE
 
-def quit_chat(bot, update):
-  api_calls.toggle_room_participant(update.message.chat_id)
+def chat_sticker_choice(bot, update, user_data):
+  sticker_id = update.message.sticker.file_id
+  cur_username = user_data['username']
+  room_ids = api_calls.get_room_participants()
+  for room_id in room_ids:
+    if room_id == str(update.message.chat_id):
+      continue
+    current_message = '<b>{}</b>\n\n'.format(cur_username)
+    send_message(bot, room_id, current_message)
+    send_sticker(bot, room_id, sticker_id)
+  return bot_states.CHAT_MESSAGE_CHOICE
+
+def quit_chat(bot, update, user_data):
+  if 'username' in user_data: # case when we /enter_chat and then /quit
+    api_calls.toggle_room_participant(update.message.chat_id)
   send_message(bot, update.message.chat_id, bot_messages.chat_quitted)
+  user_data.clear()
   return ConversationHandler.END
 
 def main():
@@ -512,9 +524,12 @@ def main():
     entry_points=[CommandHandler('enter_chat', enter_chat)],
     states={
       bot_states.CHAT_USERNAME_CHOICE: [MessageHandler(Filters.text, chat_username_choice, pass_user_data=True)],
-      bot_states.CHAT_MESSAGE_CHOICE: [MessageHandler(Filters.text, chat_message_choice, pass_user_data=True)],
+      bot_states.CHAT_MESSAGE_CHOICE: [
+        MessageHandler(Filters.text, chat_message_choice, pass_user_data=True),
+        MessageHandler(Filters.sticker, chat_sticker_choice, pass_user_data=True),
+      ],
     },
-    fallbacks=[RegexHandler('[/]*', quit_chat)]
+    fallbacks=[RegexHandler('[/]*', quit_chat, pass_user_data=True)]
   )
 
   updater.dispatcher.add_handler(set_username_handler)
