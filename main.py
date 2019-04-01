@@ -392,13 +392,6 @@ def done(bot, update):
 
 def notify_users(bot):
   chats = api_calls.get_all_chats_info()
-  for chat in chats:
-    chat_id = chat['chat_id']
-    if chat_id == '662978312':
-      continue
-    notify_user(bot, chat_id)
-
-  time.sleep(1800)
 
   for chat in chats:
     chat_id = chat['chat_id']
