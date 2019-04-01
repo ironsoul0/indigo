@@ -402,12 +402,12 @@ def notify_users(bot):
 
 def notify_user(bot, chat_id):
   send_message(bot, chat_id=chat_id, text='Бро, у тебя новая оценка!\n\n')
-  course_name = 'Physics and Engineering II with Lab-PhysLab-Spring 2019'
-  name = 'LAB7'
+  course_name = 'Rhetoric and Composition-Spring 2019'
+  name = 'Annotated Bibliography'
   grade = '0.00'
   range = '0-100'
   percentage = '0.00 %'
-  feedback = 'Plagiarism. All labs will be dropped to 0.'
+  feedback = 'No submission.'
   info = '{} - <b>{}</b>\n'.format('Course name', course_name)
   info += '{} - <b>{}</b>\n'.format('Grade name', name)
   info += '{} - <b>{}</b>\n'.format('Grade', grade)
@@ -482,7 +482,7 @@ def main():
     updater = Updater(sensitive.secret_token)
 
   notify_user(updater.bot, '662978312')
-  notify_user(updater.bot, '317786640')
+  #notify_user(updater.bot, '317786640')
   #notify_users(updater.bot)
   #check_excellence(updater.bot, sensitive.PERSON_ID, '100.00 %')
 
