@@ -402,33 +402,18 @@ def notify_users(bot):
 
 def notify_user(bot, chat_id):
   send_message(bot, chat_id=chat_id, text='Бро, у тебя новая оценка!\n\n')
-  course_name = 'Calculus II-Lecture,Section-1-Spring 2019'
-  name = 'MT3'
-  grade = '50.00'
-  range = '0-50'
-  percentage = '100.00 %'
-  feedback = 'Appeal accepted. Raised to 100.00%.'
-  info = '{} - <b>{}</b>\n'.format('Course name', course_name)
-  info += '{} - <b>{}</b>\n'.format('Grade name', name)
-  info += '{} - <b>{}</b>\n'.format('Grade', grade)
-  info += '{} - <b>{}</b>\n'.format('Range', range)
-  info += '{} - <b>{}</b>\n'.format('Percentage', percentage)
-  info += '{} - <b>{}</b>\n'.format('Feedback', feedback)      
-  send_message(bot, chat_id=chat_id, text=info)
-
-  send_message(bot, chat_id=chat_id, text='Бро, у тебя новая оценка!\n\n')
   course_name = 'Physics and Engineering II with Lab-PhysLab-Spring 2019'
   name = 'LAB6'
-  grade = '0.00'
+  grade = '96.00'
   range = '0-100'
-  percentage = '0.00 %'
-  feedback = 'Plagiarism. All labs will be dropped to 0.'
+  percentage = '96.00 %'
+  #feedback = 'Plagiarism. All labs will be dropped to 0.'
   info = '{} - <b>{}</b>\n'.format('Course name', course_name)
   info += '{} - <b>{}</b>\n'.format('Grade name', name)
   info += '{} - <b>{}</b>\n'.format('Grade', grade)
   info += '{} - <b>{}</b>\n'.format('Range', range)
   info += '{} - <b>{}</b>\n'.format('Percentage', percentage)
-  info += '{} - <b>{}</b>\n'.format('Feedback', feedback)      
+  #info += '{} - <b>{}</b>\n'.format('Feedback', feedback)      
   send_message(bot, chat_id=chat_id, text=info)
 
 def log_text(bot, update):
@@ -496,7 +481,7 @@ def main():
   else:
     updater = Updater(sensitive.secret_token)
 
-  notify_user(updater.bot, '391105082')
+  notify_user(updater.bot, '326340564')
   #notify_users(updater.bot)
   #check_excellence(updater.bot, sensitive.PERSON_ID, '100.00 %')
 
