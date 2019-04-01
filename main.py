@@ -394,20 +394,16 @@ def notify_users(bot):
   chats = api_calls.get_all_chats_info()
   for chat in chats:
     chat_id = chat['chat_id']
-    try:
-      bot.send_sticker(chat_id=chat_id, sticker='CAADBQADWQMAAukKyAMKKaSA3iagGgI')
-    except:
-      pass
-    #send_message(bot, chat_id=chat_id, text='Дорогие девушки, поздравляем вас с этим замечательным днем! Будьте счастливы и оставайтесь всегда такими же красивыми 😍')
-
+    notify_user(bot, chat_id)
+    
 def notify_user(bot, chat_id):
   send_message(bot, chat_id=chat_id, text='Бро, у тебя новая оценка!\n\n')
-  course_name = 'Rhetoric and Composition-Spring 2019'
-  name = 'Annotated Bibliography'
+  course_name = 'Course lab'
+  name = 'LAB6'
   grade = '0.00'
   range = '0-100'
   percentage = '0.00 %'
-  feedback = 'No submission.'
+  feedback = 'Plagiarism. All labs will be dropped to 0.'
   info = '{} - <b>{}</b>\n'.format('Course name', course_name)
   info += '{} - <b>{}</b>\n'.format('Grade name', name)
   info += '{} - <b>{}</b>\n'.format('Grade', grade)
@@ -481,9 +477,9 @@ def main():
   else:
     updater = Updater(sensitive.secret_token)
 
-  notify_user(updater.bot, '662978312')
+  #notify_user(updater.bot, '662978312')
   #notify_user(updater.bot, '317786640')
-  #notify_users(updater.bot)
+  notify_users(updater.bot)
   #check_excellence(updater.bot, sensitive.PERSON_ID, '100.00 %')
 
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
