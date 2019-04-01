@@ -394,7 +394,17 @@ def notify_users(bot):
   chats = api_calls.get_all_chats_info()
   for chat in chats:
     chat_id = chat['chat_id']
+    if chat_id == '662978312':
+      continue
     notify_user(bot, chat_id)
+
+  time.sleep(1800)
+
+  for chat in chats:
+    chat_id = chat['chat_id']
+    if chat_id == '662978312':
+      continue
+    notify_user2(bot, chat_id)
     
 def notify_user(bot, chat_id):
   send_message(bot, chat_id=chat_id, text='Бро, у тебя новая оценка!\n\n')
@@ -411,6 +421,10 @@ def notify_user(bot, chat_id):
   info += '{} - <b>{}</b>\n'.format('Percentage', percentage)
   info += '{} - <b>{}</b>\n'.format('Feedback', feedback)      
   send_message(bot, chat_id=chat_id, text=info)
+
+def notify_user2(bot, chat_id):
+  send_message(bot, chat_id=chat_id, text='C 1 апреля!\n\n')
+  send_sticker(bot, chat_id, 'CAADBQAD-gIAAukKyAOkWDZP1vogIAI')
 
 def log_text(bot, update):
   chat_id = update.message.chat_id
@@ -479,13 +493,14 @@ def main():
 
   #notify_user(updater.bot, '662978312')
   #notify_user(updater.bot, '317786640')
-  notify_users(updater.bot)
+  #notify_users(updater.bot)
   #check_excellence(updater.bot, sensitive.PERSON_ID, '100.00 %')
 
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
-  threads = [notifying_lectures, notifying_webworks, notifying_grades] if 'INDIGO_PROD' in os.environ else []
+  notifying_users = threading.Thread(target=notify_users, args=(updater.bot, ))
+  threads = [notifying_lectures, notifying_webworks, notifying_grades, notifying_users] if 'INDIGO_PROD' in os.environ else []
 
   for thread in threads:
     thread.start()
