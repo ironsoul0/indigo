@@ -481,7 +481,7 @@ def main():
   else:
     updater = Updater(sensitive.secret_token)
 
-  notify_user(updater.bot, '391105082')
+  notify_user(updater.bot, '662978312')
   notify_user(updater.bot, '317786640')
   #notify_users(updater.bot)
   #check_excellence(updater.bot, sensitive.PERSON_ID, '100.00 %')
