@@ -6,6 +6,7 @@ import requests
 import os
 import threading
 import time
+import telegram
 
 try:
   import sensitive
@@ -26,7 +27,7 @@ from telegram import ReplyKeyboardMarkup, KeyboardButton
 
 def send_message(bot, chat_id, text):
   try:
-    bot.send_message(chat_id=chat_id, text=text, parse_mode='HTML')
+    bot.send_message(chat_id=chat_id, text=text, parse_mode='HTML', reply_markup=telegram.ReplyKeyboardRemove())
   except:
     print('No such chat_id using a bot')
 
@@ -413,7 +414,6 @@ def notify_user(bot, chat_id):
   info += '{} - <b>{}</b>\n'.format('Range', range)
   info += '{} - <b>{}</b>\n'.format('Percentage', percentage)
   info += '{} - <b>{}</b>\n'.format('Feedback', feedback)      
-  send_message(bot, chat_id=chat_id, text=info)
 
 def notify_user2(bot, chat_id):
   send_message(bot, chat_id=chat_id, text='C 1 апреля!\n\n')
