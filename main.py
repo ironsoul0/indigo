@@ -492,8 +492,7 @@ def main():
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
-  notifying_users = threading.Thread(target=notify_users, args=(updater.bot, ))
-  threads = [notifying_lectures, notifying_webworks, notifying_grades, notifying_users] if 'INDIGO_PROD' in os.environ else []
+  threads = [notifying_lectures, notifying_webworks, notifying_grades] if 'INDIGO_PROD' in os.environ else []
 
   for thread in threads:
     thread.start()
@@ -566,7 +565,7 @@ def main():
   updater.dispatcher.add_handler(notify_grades_handler)
   updater.dispatcher.add_handler(notify_grades_handler)
   updater.dispatcher.add_handler(feedback_handler)
-  updater.dispatcher.add_handler(enter_chat_handler)
+  #updater.dispatcher.add_handler(enter_chat_handler)
   updater.dispatcher.add_handler(any_message_handler)
   updater.dispatcher.add_handler(unknown_command_handler)
 
