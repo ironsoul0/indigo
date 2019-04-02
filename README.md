@@ -15,7 +15,6 @@
 - Notifications about new grades
 - Notifications about new webworks
 - Reminders of upcoming lectures
-- Anonymous chat
 
 ## 💻 Stack
 
