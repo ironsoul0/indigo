@@ -1,15 +1,20 @@
-import requests 
+# -*- coding: utf-8 -*-
+import requests
 from bs4 import BeautifulSoup
 
+def login_to_moodle(username, password):
+    url = "https://moodle.nu.edu.kz/login/index.php"
+    session = requests.Session()
+    payload = {
+            'username': username,
+            'password': password,
+            'remeberusername': 0
+    }
+    session.post(url, data=payload)
+    return session
+
 def get_grades(username, password):
-  url = 'https://moodle.nu.edu.kz/login/index.php'
-  r = requests.Session()
-  payload = {
-      'username': username,
-      'password': password,
-      'rememberusername': '0'
-  }
-  r.post(url, data=payload)
+  r = login_to_moodle(username, password)
   html_doc = r.get('https://moodle.nu.edu.kz/grade/report/overview/index.php').text
   soup = BeautifulSoup(html_doc, 'html.parser')
   overview_grade = soup.find(id='overview-grade')
@@ -44,14 +49,14 @@ def get_grades(username, password):
       if 'mean of grades' in column_itemname.text.lower():
         continue
       if 'среднее взвешенное' in column_itemname.text.lower():
-        continue 
+        continue
       if 'course total' in column_itemname.text.lower():
         continue
       if 'attendance' in column_itemname.text.lower():
         continue
       if 'қатыс' in column_itemname.text.lower():
         continue
-      
+
       grade_item = {}
       grade_item['name'] = column_itemname.text
       grade_item['grade'] = column_grade.text
@@ -63,3 +68,36 @@ def get_grades(username, password):
 
   r.close()
   return courses
+
+def parse_for_deadlines(soup):
+    '''
+    This is a helper method that
+    parses a moodle page for
+    "Deadline cards" or that is what
+    they are called
+    '''
+
+    # This is a pattern for deadline cards
+    s = soup.findAll('div', {"class":"event",
+                             "data-region":"event-item"})
+
+    deadlines = []
+    for deadline in s:
+        deadlines.append({
+                'deadline_name': deadline.a.text,
+                'deadline_date': deadline.div.text
+                })
+    return deadlines
+
+def get_deadlines(username, password):
+    r = login_to_moodle(username, password)
+    try:
+        html_doc = r.get("https://moodle.nu.edu.kz/my").text
+    except Exception, e:
+        print ("Catched an error when trying to connect to moodle")
+        print (e)
+
+    soup = BeautifulSoup(html_doc, 'html.parser')
+
+    deadlines = parse_for_deadlines(soup)
+    return deadlines
