@@ -97,6 +97,8 @@ def get_deadlines(username, password):
         print ("Catched an error when trying to connect to moodle")
         print (e)
 
+    r.close()
+
     soup = BeautifulSoup(html_doc, 'html.parser')
 
     deadlines = parse_for_deadlines(soup)
