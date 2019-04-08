@@ -38,30 +38,30 @@ def send_sticker(bot, chat_id, sticker_id):
     print('No such chat_id using a bot')
 
 def unknown_command(bot, update):
-  send_message(bot, 
-    chat_id=update.message.chat_id, 
+  send_message(bot,
+    chat_id=update.message.chat_id,
     text=bot_messages.unknown_command_response
   )
 
 def start(bot, update):
-  send_message(bot, 
-    chat_id=update.message.chat_id, 
+  send_message(bot,
+    chat_id=update.message.chat_id,
     text=bot_messages.start_command_response
   )
 
 def username_choice(bot, update):
   new_username = update.message.text.lower()
   print('{} wants to join Indigo community'.format(new_username))
-  update.message.reply_text(bot_messages.updated_login_response)  
+  update.message.reply_text(bot_messages.updated_login_response)
   api_calls.update_username(update.message.chat_id, new_username)
   return ConversationHandler.END
 
 def set_username(bot, update):
   update.message.reply_text(bot_messages.set_username_response, parse_mode='HTML')
-  return bot_states.USERNAME_CHOICE 
+  return bot_states.USERNAME_CHOICE
 
 def notify_about_new_webwork(bot, chat_id, course_name, new_webwork):
-  send_message(bot, 
+  send_message(bot,
     chat_id=chat_id,
     text='{}{} - {}'.format(bot_messages.new_webwork_response, course_name, new_webwork)
   )
@@ -85,10 +85,10 @@ def check_new_webworks(bot, chat_id):
       if (not course_name in old_webworks) or (not new_webwork in old_webworks[course_name]):
         notify_about_new_webwork(bot, chat_id, course_name, new_webwork)
   set_webworks_for_chat(chat_id, current_webworks)
-  
+
 def webwork_password_choice(bot, update):
   new_password = update.message.text
-  update.message.reply_text(bot_messages.updated_password_response)  
+  update.message.reply_text(bot_messages.updated_password_response)
   api_calls.update_webwork_password(update.message.chat_id, new_password)
   return ConversationHandler.END
 
@@ -98,7 +98,7 @@ def set_webwork_password(bot, update):
 
 def main_password_choice(bot, update):
   new_password = update.message.text
-  update.message.reply_text(bot_messages.updated_password_response)  
+  update.message.reply_text(bot_messages.updated_password_response)
   api_calls.update_main_password(update.message.chat_id, new_password)
   return ConversationHandler.END
 
@@ -107,7 +107,7 @@ def set_main_password(bot, update):
   return bot_states.MAIN_PASSWORD_CHOICE
 
 def help(bot, update):
-  update.message.reply_text(bot_messages.help_command_response)  
+  update.message.reply_text(bot_messages.help_command_response)
 
 def set_webworks_for_chat(chat_id, webworks):
   api_calls.update_webworks_for_chat(chat_id, webworks)
@@ -117,34 +117,34 @@ def notify_webwork(bot, update):
   if not 'webwork_password' in chat_info or not 'username' in chat_info:
     update.message.reply_text(bot_messages.no_login_or_password_response)
   else:
-    send_message(bot, chat_id=update.message.chat_id, 
+    send_message(bot, chat_id=update.message.chat_id,
       text=bot_messages.checking_data_response)
     current_webworks = webwork_login.get_webworks(chat_info['username'], chat_info['webwork_password'])
     if 'fail' in current_webworks:
-      send_message(bot, chat_id=update.message.chat_id, 
+      send_message(bot, chat_id=update.message.chat_id,
         text=bot_messages.wrong_webwork_data_response)
     else:
       send_message(bot, chat_id=update.message.chat_id, text=bot_messages.successful_webwork_login_response)
       for section, webworks in current_webworks.items():
         for webwork in webworks:
           send_message(bot, chat_id=update.message.chat_id, text='• {} - {}'.format(section, webwork))
-      set_webworks_for_chat(update.message.chat_id, current_webworks)      
-  
+      set_webworks_for_chat(update.message.chat_id, current_webworks)
+
 def notify_grades(bot, update):
   chat_info = api_calls.get_chat_info(update.message.chat_id)
   if not 'main_password' in chat_info or not 'username' in chat_info:
     update.message.reply_text(bot_messages.no_login_or_password_response)
   else:
-    send_message(bot, chat_id=update.message.chat_id, 
+    send_message(bot, chat_id=update.message.chat_id,
       text=bot_messages.checking_data_response)
     current_grades = moodle_login.get_grades(chat_info['username'], chat_info['main_password'])
     if len(current_grades.keys()) == 0:
-      send_message(bot, chat_id=update.message.chat_id, 
+      send_message(bot, chat_id=update.message.chat_id,
         text=bot_messages.wrong_registrar_data_response)
     else:
       send_message(bot, chat_id=update.message.chat_id, text=bot_messages.successful_moodle_login_response)
       set_grades_for_chat(update.message.chat_id, current_grades)
-      
+
 def set_grades_for_chat(chat_id, new_grades):
   api_calls.update_grades_for_chat(chat_id, new_grades)
 
@@ -153,13 +153,13 @@ def get_schedule(bot, update):
   if not 'main_password' in chat_info or not 'username' in chat_info:
     update.message.reply_text(bot_messages.no_login_or_password_response)
   else:
-    send_message(bot, chat_id=update.message.chat_id, 
+    send_message(bot, chat_id=update.message.chat_id,
       text=bot_messages.checking_data_response)
     try:
       schedule = registrar_login.get_schedule(chat_info['username'], chat_info['main_password'])
       print('{} used /get_schedule command'.format(chat_info['username']))
       if len(schedule.keys()) == 0:
-        send_message(bot, chat_id=update.message.chat_id, 
+        send_message(bot, chat_id=update.message.chat_id,
           text=bot_messages.wrong_registrar_data_response)
       else:
         send_message(bot, chat_id=update.message.chat_id, text=bot_messages.successful_registrar_login_response)
@@ -172,7 +172,7 @@ def show_schedule(bot, update):
   chat_id = update.message.chat_id
   chat_info = api_calls.get_chat_info(chat_id)
   if not 'schedule' in chat_info:
-    send_message(bot, chat_id=chat_id, 
+    send_message(bot, chat_id=chat_id,
       text=bot_messages.no_schedule_response)
   else:
     print('{} used /show_schedule command'.format(chat_info['username']))
@@ -184,19 +184,19 @@ def show_schedule(bot, update):
         message = message + bot_messages.no_lectures_this_day
       for subject in subjects:
         message = message + '{}\n{} - {}\n{}\n'.format(
-          subject['course_name'], 
-          subject['start_time'], 
-          subject['end_time'], 
+          subject['course_name'],
+          subject['start_time'],
+          subject['end_time'],
           subject['lecture_room']
         )
         message = message + '\n'
     send_message(bot, chat_id=chat_id, text=message)
-      
+
 def next_lecture(bot, update):
   chat_id = update.message.chat_id
   chat_info = api_calls.get_chat_info(chat_id)
   if not 'schedule' in chat_info:
-    send_message(bot, chat_id=chat_id, 
+    send_message(bot, chat_id=chat_id,
       text=bot_messages.no_schedule_response)
   else:
     print('{} used /next_lecture command'.format(chat_info['username']))
@@ -210,13 +210,13 @@ def next_lecture(bot, update):
       if start_time > current_time:
         message = '<b>{}</b>\n\n'.format(current_day)
         message = message + '{}\n{} - {}\n{}\n'.format(
-          subject['course_name'], 
-          subject['start_time'], 
-          subject['end_time'], 
+          subject['course_name'],
+          subject['start_time'],
+          subject['end_time'],
           subject['lecture_room']
-        ) 
+        )
         send_message(bot, chat_id=chat_id, text=message)
-        return 
+        return
     days = time_helpers.days
     day_index = days.index(current_day)
     for index in range(0, len(days)):
@@ -228,11 +228,11 @@ def next_lecture(bot, update):
         start_time = time_helpers.am_to_pm(subject['start_time'])
         message = '<b>{}</b>\n\n'.format(next_day)
         message = message + '{}\n{} - {}\n{}\n'.format(
-          subject['course_name'], 
-          subject['start_time'], 
-          subject['end_time'], 
+          subject['course_name'],
+          subject['start_time'],
+          subject['end_time'],
           subject['lecture_room']
-        ) 
+        )
         send_message(bot, chat_id=chat_id, text=message)
         return
 
@@ -240,13 +240,18 @@ def notify_minutes_choice(bot, update):
   chat_id = update.message.chat_id
   try:
     minutes = int(update.message.text)
-    if not (minutes >= 0 and minutes <= 120):
-      send_message(bot, chat_id=chat_id, text=bot_messages.no_notifying_minutes_response)
-      return ConversationHandler.END
-    if minutes > 0:
-      send_message(bot, chat_id=chat_id, text=bot_messages.successful_notifying_minutes_update_response)
+    text_to_send = None
+    if minutes == 0:
+        text_to_send = bot_messages.disable_notifying_minutes_response
+    elif 0 < minutes and minutes < 120:
+        text_to_send = bot_messages.successful_notifying_minutes_update_response
     else:
-      send_message(bot, chat_id=chat_id, text=bot_messages.disable_notifying_minutes_response)
+        text_to_send = bot_messages.no_notifying_minutes_response
+    
+    send_message(bot, chat_id=chat_id, text=text_to_send)
+    if minutes < 0 or 120 < minutes:
+        return ConversationHandler.END
+    
     api_calls.update_schedule_notify_minutes(chat_id, minutes)
   except ValueError:
     send_message(bot, chat_id=chat_id, text=bot_messages.notifying_minutes_not_number_response)
@@ -256,10 +261,15 @@ def notify_minutes_choice(bot, update):
 def notify_lectures(bot, update):
   chat_id = update.message.chat_id
   chat_info = api_calls.get_chat_info(chat_id)
+  
   if not 'schedule' in chat_info:
-    send_message(bot, chat_id=chat_id, text=bot_messages.no_schedule_response)
+    send_message(bot, chat_id=chat_id, 
+                 text=bot_messages.no_schedule_response)
     return ConversationHandler.END
-  update.message.reply_text(bot_messages.notify_lectures_response, parse_mode='HTML')
+  
+  update.message.reply_text(
+          bot_messages.notify_lectures_response, 
+          parse_mode='HTML')
   return bot_states.NOTIFY_MINUTES_CHOICE
 
 def notifying_webworks_process(bot):
@@ -293,7 +303,7 @@ def notifying_lectures_process(bot):
       current_day = time_helpers.current_day()
       current_minutes = time_helpers.current_time_in_minutes()
       if not current_day in schedule:
-        continue 
+        continue
       for subject in schedule[current_day]:
         subject_start_time = time_helpers.am_to_pm(subject['start_time'])
         if subject_start_time - current_minutes == notify_minutes:
@@ -306,11 +316,11 @@ def notifying_lectures_process(bot):
             right_word = 'минут'
           message = 'Урок ровно через <b>{} {}</b>, не опоздай 😉\n\n'.format(notify_minutes, right_word)
           message = message + '{}\n{} - {}\n{}\n'.format(
-            subject['course_name'], 
-            subject['start_time'], 
-            subject['end_time'], 
+            subject['course_name'],
+            subject['start_time'],
+            subject['end_time'],
             subject['lecture_room']
-          ) 
+          )
           send_message(bot, chat_id=chat_id, text=message)
     time.sleep(60)
 
@@ -359,7 +369,7 @@ def notifying_grades_process(bot):
               if 'range' in course_grade and course_grade['range'].lower() != 'error':
                 info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
               if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
-                info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])    
+                info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])
               send_message(bot, chat_id=chat_id, text=info)
               if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
                 check_excellence(bot, chat_id, course_grade['percentage'])
@@ -369,7 +379,7 @@ def notifying_grades_process(bot):
       except:
         print('Grades exception occured but still running..')
         pass
-    
+
 def check_excellence(bot, chat_id, percentage):
   valid_percent = percentage[:-2]
   try:
@@ -399,7 +409,7 @@ def notify_users(bot):
     if chat_id == '662978312':
       continue
     notify_user2(bot, chat_id)
-    
+
 def notify_user(bot, chat_id):
   send_message(bot, chat_id=chat_id, text='Бро, у тебя новая оценка!\n\n')
   course_name = 'Course lab'
@@ -413,7 +423,7 @@ def notify_user(bot, chat_id):
   info += '{} - <b>{}</b>\n'.format('Grade', grade)
   info += '{} - <b>{}</b>\n'.format('Range', range)
   info += '{} - <b>{}</b>\n'.format('Percentage', percentage)
-  info += '{} - <b>{}</b>\n'.format('Feedback', feedback)      
+  info += '{} - <b>{}</b>\n'.format('Feedback', feedback)
 
 def notify_user2(bot, chat_id):
   send_message(bot, chat_id=chat_id, text='C 1 апреля!\n\n')
@@ -423,7 +433,7 @@ def log_text(bot, update):
   chat_id = update.message.chat_id
   chat_info = api_calls.get_chat_info(chat_id)
   if 'username' in chat_info:
-    print('{} wrote {} to Indigo'.format(chat_info['username'], update.message.text))  
+    print('{} wrote {} to Indigo'.format(chat_info['username'], update.message.text))
 
 def enter_chat(bot, update):
   chat_id = update.message.chat_id
@@ -447,7 +457,7 @@ def chat_username_choice(bot, update, user_data):
   return bot_states.CHAT_MESSAGE_CHOICE
 
 def chat_message_choice(bot, update, user_data):
-  text = update.message.text 
+  text = update.message.text
   cur_username = user_data['username']
   room_ids = api_calls.get_room_participants()
   for room_id in room_ids:
@@ -507,7 +517,7 @@ def main():
   feedback_handler = CommandHandler('feedback', feedback)
   any_message_handler = MessageHandler(Filters.text, log_text)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
-  
+
   set_username_handler = ConversationHandler(
     entry_points=[CommandHandler('set_username', set_username)],
     states={
