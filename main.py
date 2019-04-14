@@ -20,7 +20,6 @@ import registrar_login
 import time_helpers
 import bot_states
 import moodle_login
-import mynuedu
 
 from telegram import ReplyKeyboardMarkup, KeyboardButton
 
@@ -362,7 +361,7 @@ def notifying_grades_process(bot):
               if old_name == name and old_grade == grade:
                 unique_grade = False
             if unique_grade and course_name.lower() != 'error' and name.lower() != 'error' and grade.lower() != 'error':
-              send_message(bot, chat_id=chat_id, text='Бро, у тебя новая оценка!\n\n')
+              send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
               info = '{} - <b>{}</b>\n'.format('Course name', course_name)
               info += '{} - <b>{}</b>\n'.format('Grade name', name)
               info += '{} - <b>{}</b>\n'.format('Grade', grade)
@@ -401,90 +400,11 @@ def done(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.command_cancel_response)
   return ConversationHandler.END
 
-def notify_users(bot):
-  chats = api_calls.get_all_chats_info()
-
-  for chat in chats:
-    chat_id = chat['chat_id']
-    if chat_id == '662978312':
-      continue
-    notify_user2(bot, chat_id)
-
-def notify_user(bot, chat_id):
-  send_message(bot, chat_id=chat_id, text='Бро, у тебя новая оценка!\n\n')
-  course_name = 'Course lab'
-  name = 'LAB6'
-  grade = '0.00'
-  range = '0-100'
-  percentage = '0.00 %'
-  feedback = 'Plagiarism. All labs will be dropped to 0.'
-  info = '{} - <b>{}</b>\n'.format('Course name', course_name)
-  info += '{} - <b>{}</b>\n'.format('Grade name', name)
-  info += '{} - <b>{}</b>\n'.format('Grade', grade)
-  info += '{} - <b>{}</b>\n'.format('Range', range)
-  info += '{} - <b>{}</b>\n'.format('Percentage', percentage)
-  info += '{} - <b>{}</b>\n'.format('Feedback', feedback)
-
-def notify_user2(bot, chat_id):
-  send_message(bot, chat_id=chat_id, text='C 1 апреля!\n\n')
-  send_sticker(bot, chat_id, 'CAADBQAD-gIAAukKyAOkWDZP1vogIAI')
-
 def log_text(bot, update):
   chat_id = update.message.chat_id
   chat_info = api_calls.get_chat_info(chat_id)
   if 'username' in chat_info:
     print('{} wrote {} to Indigo'.format(chat_info['username'], update.message.text))
-
-def enter_chat(bot, update):
-  chat_id = update.message.chat_id
-  chat_info = api_calls.get_chat_info(chat_id)
-  if not 'notify_grades' in chat_info or not chat_info['notify_grades']:
-    send_message(bot, update.message.chat_id, bot_messages.reject_chat_response)
-    return ConversationHandler.END
-  send_message(bot, update.message.chat_id, bot_messages.choose_chat_username)
-  return bot_states.CHAT_USERNAME_CHOICE
-
-def chat_username_choice(bot, update, user_data):
-  text = update.message.text
-  if len(text) > 10 or len(text) < 3:
-    send_message(bot, update.message.chat_id, bot_messages.too_long_username_response)
-    return bot_states.CHAT_USERNAME_CHOICE
-  user_data['username'] = text
-  api_calls.toggle_room_participant(update.message.chat_id)
-  menu_keyboard = [[KeyboardButton('/quit')]]
-  menu_markup = ReplyKeyboardMarkup(menu_keyboard, one_time_keyboard=True, resize_keyboard=True)
-  bot.send_message(chat_id=update.message.chat_id, text=bot_messages.welcome_chat_response, reply_markup=menu_markup, parse_mode='HTML')
-  return bot_states.CHAT_MESSAGE_CHOICE
-
-def chat_message_choice(bot, update, user_data):
-  text = update.message.text
-  cur_username = user_data['username']
-  room_ids = api_calls.get_room_participants()
-  for room_id in room_ids:
-    if room_id == str(update.message.chat_id):
-      continue
-    current_message = '<b>{}</b>\n\n{}'.format(cur_username, text)
-    send_message(bot, room_id, current_message)
-  return bot_states.CHAT_MESSAGE_CHOICE
-
-def chat_sticker_choice(bot, update, user_data):
-  sticker_id = update.message.sticker.file_id
-  cur_username = user_data['username']
-  room_ids = api_calls.get_room_participants()
-  for room_id in room_ids:
-    if room_id == str(update.message.chat_id):
-      continue
-    current_message = '<b>{}</b>\n\n'.format(cur_username)
-    send_message(bot, room_id, current_message)
-    send_sticker(bot, room_id, sticker_id)
-  return bot_states.CHAT_MESSAGE_CHOICE
-
-def quit_chat(bot, update, user_data):
-  if 'username' in user_data: # case when we /enter_chat and then /quit
-    api_calls.toggle_room_participant(update.message.chat_id)
-  send_message(bot, update.message.chat_id, bot_messages.chat_quitted)
-  user_data.clear()
-  return ConversationHandler.END
 
 def main():
   updater = None
@@ -550,18 +470,6 @@ def main():
     fallbacks=[RegexHandler('[/]*', done)]
   )
 
-  enter_chat_handler = ConversationHandler(
-    entry_points=[CommandHandler('enter_chat', enter_chat)],
-    states={
-      bot_states.CHAT_USERNAME_CHOICE: [MessageHandler(Filters.text, chat_username_choice, pass_user_data=True)],
-      bot_states.CHAT_MESSAGE_CHOICE: [
-        MessageHandler(Filters.text, chat_message_choice, pass_user_data=True),
-        MessageHandler(Filters.sticker, chat_sticker_choice, pass_user_data=True),
-      ],
-    },
-    fallbacks=[RegexHandler('[/]*', quit_chat, pass_user_data=True)]
-  )
-
   updater.dispatcher.add_handler(set_username_handler)
   updater.dispatcher.add_handler(start_handler)
   updater.dispatcher.add_handler(set_webwork_password_handler)
@@ -575,7 +483,6 @@ def main():
   updater.dispatcher.add_handler(notify_grades_handler)
   updater.dispatcher.add_handler(notify_grades_handler)
   updater.dispatcher.add_handler(feedback_handler)
-  #updater.dispatcher.add_handler(enter_chat_handler)
   updater.dispatcher.add_handler(any_message_handler)
   updater.dispatcher.add_handler(unknown_command_handler)
 

@@ -124,32 +124,3 @@ def update_schedule_notify_minutes(chat_id, new_minutes):
     data=json.dumps(payload),
     headers=headers
   )
-
-def get_room_participants(room_id="5c9f1ba989811004cdb5014c"):
-  payload = {
-    'room_id': room_id
-  }
-  headers = {
-    'content-type': 'application/json; charset=utf-8'
-  }
-  result = requests.get(
-    '{}/room/get_participants'.format(API_URL),
-    data=json.dumps(payload),
-    headers=headers
-  )
-  result = json.loads(result.text)
-  return result['participants']
-
-def toggle_room_participant(chat_id, room_id="5c9f1ba989811004cdb5014c"):
-  payload = {
-    'chat_id': chat_id,
-    'room_id': room_id
-  }
-  headers = {
-    'content-type': 'application/json; charset=utf-8'
-  }
-  requests.post(
-    '{}/room/toggle_participant'.format(API_URL),
-    data=json.dumps(payload),
-    headers=headers
-  )

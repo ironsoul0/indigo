@@ -93,9 +93,9 @@ def get_deadlines(username, password):
     r = login_to_moodle(username, password)
     try:
         html_doc = r.get("https://moodle.nu.edu.kz/my").text
-    except Exception, e:
+    except:
         print ("Catched an error when trying to connect to moodle")
-        print (e)
+        
 
     r.close()
 
