@@ -370,8 +370,6 @@ def notifying_grades_process(bot):
               if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
                 info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])
               send_message(bot, chat_id=chat_id, text=info)
-              if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
-                check_excellence(bot, chat_id, course_grade['percentage'])
               print('{} got a new grade'.format(username))
               print('{} - {} - {}'.format(course_name, name, grade))
         set_grades_for_chat(chat_id, current_grades)
