@@ -389,8 +389,9 @@ def main():
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
-  
-  threads = [notifying_webworks, notifying_grades, restart_heroku_dynos] if 'INDIGO_PROD' in os.environ else []
+  restarting_dynos = threading.Thread(target=restart_heroku_dynos)
+
+  threads = [notifying_webworks, notifying_grades, restarting_dynos] if 'INDIGO_PROD' in os.environ else []
 
   for thread in threads:
     thread.start()
