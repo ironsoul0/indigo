@@ -12,7 +12,6 @@ python-telegram-bot = "*"
 bs4 = "*"
 pytz = "*"
 python-dotenv = "*"
-schedule = "*"
 
 [requires]
 python_version = "3.7"
