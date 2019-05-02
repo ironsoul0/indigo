@@ -3,41 +3,41 @@ import json
 import re
 from bs4 import BeautifulSoup
 
-def login_to_course(url, login, passwd):    
-  result = [] 
-  response = requests.post(url, files={'user': (None, login), 'passwd': (None, passwd)})
-  successPat = re.compile(r'Logged in as {}'.format(login))    
-  if successPat.search(response.text):
-    soup = BeautifulSoup(response.text, 'html.parser')
-    trs = soup.table.find_all('tr')
-    for tr in trs:
-      tds = tr.find_all('td')
-      if len(tds) > 1:
-        if 'closed' in tds[-1].text.lower():
+def get_course_webworks(URL, login, passwd):    
+  course_webworks = [] 
+  response = requests.post(
+    URL, 
+    files={
+      'user': (None, login), 
+      'passwd': (None, passwd)
+    }
+  )
+  success_pattern = re.compile(r'Logged in as {}'.format(login))    
+  if success_pattern.search(response.text):
+    soup_entry = BeautifulSoup(response.text, 'html.parser')
+    webwork_rows = soup_entry.table.find_all('tr')
+    for single_row in webwork_rows:
+      webwork_entities = single_row.find_all('td')
+      if len(webwork_entities) > 1:
+        if 'closed' in webwork_entities[-1].text.lower():
           continue
-        result.append('{} - {}'.format(tds[1].text, tds[-1].text)) 
-    return result
+        course_webworks.append('{} - {}'.format(webwork_entities[1].text, webwork_entities[-1].text)) 
+    return course_webworks
   else:
     raise("Couldn't login")
 
 def get_webworks(login, passwd):
-    url = "http://webwork.sst.nu.edu.kz/"
-    pageText = requests.get(url).text
-    loginLinkPat = re.compile(r'<a href="/(.+?)/">(.+?)</a>')
-    link_list = []
-    cnt = 0
-    for match in loginLinkPat.finditer(pageText):
-        link_list.append(match.group(1))    
-    
-    courses = {}
-
-    for course in link_list: 
-        try:
-            sets = login_to_course(url + course, login, passwd)
-            courses[course] = sets
-            cnt += 1
-        except:
-            pass
-    if cnt == 0:
-      return {'fail': [ ]}
-    return courses
+  webworks_URL = "http://webwork.sst.nu.edu.kz/"
+  page_text = requests.get(webworks_URL).text
+  login_link_pattern = re.compile(r'<a href="/(.+?)/">(.+?)</a>')
+  available_courses = []
+  for course_match in login_link_pattern.finditer(page_text):
+    available_courses.append(course_match.group(1))  
+  webworks = {}
+  for course in available_courses: 
+    try:
+      course_webworks = get_course_webworks(webworks_URL + course, login, passwd)
+      webworks[course] = course_webworks
+    except:
+      pass
+  return webworks
