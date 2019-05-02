@@ -373,15 +373,15 @@ def any_message_log(bot, update):
 
 def restart_heroku_dynos():
   while True:
-    time.sleep(60)
-    requests.delete(
+    time.sleep(120)
+    print(requests.delete(
       'https://api.heroku.com/apps/indigo-project/dynos', 
       auth=(os.environ['EMAIL'], os.environ['PASSWORD']),
       headers={
         'Content-Type': 'application/json',
         'Accept': 'application/vnd.heroku+json; version=3'
       }
-    )
+    ).text)
 
 def main():
   updater = Updater(os.environ['BOT_TOKEN'])
