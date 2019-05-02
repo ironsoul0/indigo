@@ -100,12 +100,12 @@ def set_webworks_for_chat(chat_id, webworks):
 
 def notify_webwork(bot, update):
   chat_id = update.message.chat_id
+  send_chatting_action(bot, chat_id)
   chat_info = api_calls.get_chat_info(chat_id)
   if not 'webwork_password' in chat_info or not 'username' in chat_info:
     update.message.reply_text(bot_messages.no_login_or_password_response)
   else:
     send_message(bot, chat_id=chat_id, text=bot_messages.checking_data_response)
-    send_chatting_action(bot, chat_id)
     current_webworks = webwork_login.get_webworks(chat_info['username'], chat_info['webwork_password'])
     if len(current_webworks.keys()) == 0:
       send_message(bot, chat_id=chat_id, text=bot_messages.wrong_webwork_data_response)
@@ -117,12 +117,13 @@ def notify_webwork(bot, update):
       set_webworks_for_chat(chat_id, current_webworks)
 
 def notify_grades(bot, update):
-  chat_id, chat_info = update.message.chat_id, api_calls.get_chat_info(update.message.chat_id)
+  chat_id = update.message.chat_id
+  send_chatting_action(bot, chat_id)
+  chat_info = api_calls.get_chat_info(update.message.chat_id)
   if not 'main_password' in chat_info or not 'username' in chat_info:
     update.message.reply_text(bot_messages.no_login_or_password_response)
   else:
     send_message(bot, chat_id=chat_id, text=bot_messages.checking_data_response)
-    send_chatting_action(bot, chat_id)
     current_grades = moodle_login.get_grades(chat_info['username'], chat_info['main_password'])
     if len(current_grades.keys()) == 0:
       send_message(bot, chat_id=chat_id, text=bot_messages.wrong_registrar_data_response)
@@ -135,8 +136,8 @@ def set_grades_for_chat(chat_id, new_grades):
 
 def get_schedule(bot, update):
   chat_id = update.message.chat_id
-  chat_info = api_calls.get_chat_info(chat_id)
   send_chatting_action(bot, chat_id)
+  chat_info = api_calls.get_chat_info(chat_id)
   if not 'main_password' in chat_info or not 'username' in chat_info:
     update.message.reply_text(bot_messages.no_login_or_password_response)
   else:
@@ -373,15 +374,16 @@ def any_message_log(bot, update):
 
 def restart_heroku_dynos():
   while True:
-    time.sleep(120)
-    print(requests.delete(
+    time.sleep(18000)
+    log_text('Restarting from a special function..')
+    requests.delete(
       'https://api.heroku.com/apps/indigo-project/dynos', 
       auth=(os.environ['EMAIL'], os.environ['PASSWORD']),
       headers={
         'Content-Type': 'application/json',
         'Accept': 'application/vnd.heroku+json; version=3'
       }
-    ).text)
+    )
 
 def main():
   updater = Updater(os.environ['BOT_TOKEN'])
