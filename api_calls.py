@@ -12,6 +12,12 @@ except ImportError:
   API_URL = os.environ['API_URL']
   print(API_URL)
 
+cur_headers = {
+  'Accept': 'application/vnd.heroku+json; version=3'
+}
+
+print(requests.get('https://api.heroku.com/apps/indigo-project/dynos', headers=cur_headers).text)
+
 def update_username(chat_id, new_username):
   payload = {
     'username': new_username,

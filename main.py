@@ -326,8 +326,6 @@ def notifying_lectures_process(bot):
 def notifying_grades_process(bot):
   rep = 0
   while True:
-    if time_helpers.current_time_in_minutes() >= 60 and time_helpers.current_time_in_minutes() <= 480:
-      continue
     rep += 1
     print('Starting to check for new grades.. {}'.format(rep))
     chats = api_calls.get_all_chats_info()
