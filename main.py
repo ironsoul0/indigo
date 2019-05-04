@@ -251,12 +251,19 @@ def notify_lectures(bot, update):
   update.message.reply_text(bot_messages.notify_lectures_response, parse_mode='HTML')
   return bot_states.NOTIFY_MINUTES_CHOICE
 
+def get_all_chats_info():
+  try:
+    return api_calls.get_all_chats_info()
+  except:
+    restart_heroku_dynos()
+    pass
+
 def notifying_webworks_process(bot):
   while True:
     if time_helpers.current_time_in_minutes() >= 0 and time_helpers.current_time_in_minutes() <= 719:
       continue
     log_text('Starting to notify about new webworks..')
-    chats = api_calls.get_all_chats_info()
+    chats = get_all_chats_info()
     for chat in chats:
       if chat['notify_webworks']:
         try:
@@ -272,7 +279,7 @@ def notifying_lectures_process(bot):
   while True:
     if time_helpers.current_time_in_minutes() >= 60 and time_helpers.current_time_in_minutes() <= 480:
       continue
-    chats = api_calls.get_all_chats_info()
+    chats = get_all_chats_info()
     for chat in chats:
       notify_minutes = chat['schedule_notify_minutes']
       if notify_minutes == 0:
@@ -308,7 +315,7 @@ def notifying_grades_process(bot):
   while True:
     grade_cycles += 1
     log_text('Starting to check for new grades.. {}'.format(grade_cycles))
-    chats = api_calls.get_all_chats_info()
+    chats = get_all_chats_info()
     total_number = len(chats)
     current_number = 0
     for chat in chats:
