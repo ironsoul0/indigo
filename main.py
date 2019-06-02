@@ -310,8 +310,8 @@ def notifying_lectures_process(bot):
 def notifying_grades_process(bot):
   grade_cycles = 0
   while True:
-    grade_cycles += 1
-    log_text('Starting to check for new grades.. {}'.format(grade_cycles))
+    #grade_cycles += 1
+    #log_text('Starting to check for new grades.. {}'.format(grade_cycles))
     chats = get_all_chats_info()
     total_number = len(chats)
     current_number = 0
