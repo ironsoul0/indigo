@@ -393,6 +393,7 @@ def restart_heroku_dynos():
     )
 
 def main():
+  return 0
   updater = Updater(os.environ['BOT_TOKEN'])
 
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))

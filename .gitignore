@@ -1,4 +1,8 @@
+# IDE setup for development
 .vscode/
-sensitive.py
-test.py
+
+# For testing new functionality
+bot_testing.py
+
+# All sensitive info like tokens, passwords, etc.
 .env

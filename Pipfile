@@ -12,6 +12,7 @@ python-telegram-bot = "*"
 bs4 = "*"
 pytz = "*"
 python-dotenv = "*"
+cryptography = "*"
 
 [requires]
 python_version = "3.7"
