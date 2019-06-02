@@ -1,5 +1,6 @@
 # IDE setup for development
 .vscode/
+.DS_Store
 
 # For testing new functionality
 bot_testing.py
