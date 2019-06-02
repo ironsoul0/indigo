@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://www.t.me/nuhelper_bot">
-    <img width="200" src="resources/foreignlogo.png">
+    <img width="200" src="resources/foreign_logo.png">
   </a>
 </p>
 
