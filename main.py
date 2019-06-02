@@ -1,21 +1,18 @@
-from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, ConversationHandler, RegexHandler
 import telegram
-from bs4 import BeautifulSoup
 import requests
 import os
 import threading
 import time
+from bs4 import BeautifulSoup
+from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, ConversationHandler, RegexHandler
+
+import api_calls
+from helpers import time_helpers
+from scrapers import moodle_login, registrar_login, webwork_login
+from configs import bot_messages, bot_states
 
 from dotenv import load_dotenv
 load_dotenv()
-
-import webwork_login
-import api_calls
-import bot_messages
-import registrar_login
-import time_helpers
-import bot_states
-import moodle_login
 
 def log_text(debug_text):
   print(debug_text)
@@ -393,15 +390,14 @@ def restart_heroku_dynos():
     )
 
 def main():
-  return 0
   updater = Updater(os.environ['BOT_TOKEN'])
-
+  
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
   restarting_dynos = threading.Thread(target=restart_heroku_dynos)
 
-  threads = [notifying_webworks, notifying_grades, restarting_dynos] if 'INDIGO_PROD' in os.environ else []
+  threads = [notifying_webworks, notifying_grades, restarting_dynos, notifying_lectures] if 'INDIGO_PROD' in os.environ else []
 
   for thread in threads:
     thread.start()
