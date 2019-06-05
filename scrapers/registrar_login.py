@@ -43,7 +43,7 @@ def get_schedule(username, password):
       'Connection': 'close',
       'Upgrade-Insecure-Requests': '1'
   }
-  text = r.get(r'https://registrar.nu.edu.kz/my-registrar/personal-schedule/json?method=drawStudentSchedule', headers=headersGet)
+  text = r.get(r'https://registrar.nu.edu.kz/my-registrar/personal-schedule/json?method=drawStudentSchedule&type=reg', headers=headersGet)
   raw_schedule = BeautifulSoup(text.text.replace('\r', '').replace('\n', '').replace('\\', '').replace('rn', ''), 'html.parser')
   grades_table = raw_schedule.find('div', class_='student_class_schedule_reports')
   if grades_table is None:
