@@ -3,10 +3,11 @@ import requests
 import os
 import threading
 import time
+import api_calls
+
 from bs4 import BeautifulSoup
 from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, ConversationHandler, RegexHandler
 
-import api_calls
 from helpers import time_helpers
 from scrapers import moodle_login, registrar_login, webwork_login
 from configs import bot_messages, bot_states
@@ -311,8 +312,8 @@ def notifying_lectures_process(bot):
 def notifying_grades_process(bot):
   grade_cycles = 0
   while True:
-    #grade_cycles += 1
-    #log_text('Starting to check for new grades.. {}'.format(grade_cycles))
+    grade_cycles += 1
+    log_text('Starting to check for new grades.. {}'.format(grade_cycles))
     chats = get_all_chats_info()
     total_number = len(chats)
     current_number = 0
@@ -414,7 +415,6 @@ def main():
   notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
   notify_grades_handler = CommandHandler('notify_grades', notify_grades)
   next_lecture_handler = CommandHandler('next_lecture', next_lecture)
-  #feedback_handler = CommandHandler('feedback', feedback)
   any_message_handler = MessageHandler(Filters.text, any_message_log)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
 
@@ -458,21 +458,25 @@ def main():
     fallbacks=[RegexHandler('[/]*', done)]
   )
 
-  updater.dispatcher.add_handler(set_username_handler)
-  updater.dispatcher.add_handler(start_handler)
-  updater.dispatcher.add_handler(set_webwork_password_handler)
-  updater.dispatcher.add_handler(set_main_password_handler)
-  updater.dispatcher.add_handler(show_schedule_handler)
-  updater.dispatcher.add_handler(help_handler)
-  updater.dispatcher.add_handler(notify_webwork_handler)
-  updater.dispatcher.add_handler(get_schedule_handler)
-  updater.dispatcher.add_handler(next_lecture_handler)
-  updater.dispatcher.add_handler(notify_lectures_handler)
-  updater.dispatcher.add_handler(notify_grades_handler)
-  updater.dispatcher.add_handler(notify_grades_handler)
-  updater.dispatcher.add_handler(feedback_handler)
-  updater.dispatcher.add_handler(any_message_handler)
-  updater.dispatcher.add_handler(unknown_command_handler)
+  bot_handlers = [
+    start_handler,
+    set_username_handler,
+    set_webwork_password_handler,
+    set_main_password_handler,
+    show_schedule_handler,
+    help_handler,
+    notify_webwork_handler,
+    get_schedule_handler,
+    next_lecture_handler,
+    notify_lectures_handler,
+    notify_grades_handler,
+    feedback_handler,
+    any_message_handler,
+    unknown_command_handler
+  ]
+
+  for handler in bot_handlers:
+    updater.dispatcher.add_handler(handler)
 
   updater.start_polling()
 
