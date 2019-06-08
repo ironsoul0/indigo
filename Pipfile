@@ -13,7 +13,6 @@ bs4 = "*"
 pytz = "*"
 python-dotenv = "*"
 cryptography = "*"
-schedule = "*"
 
 [requires]
 python_version = "3.7"

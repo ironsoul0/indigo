@@ -3,15 +3,13 @@ import requests
 import os
 import threading
 import time
-import schedule
-import api_calls
+from bs4 import BeautifulSoup
+from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, ConversationHandler, RegexHandler
 
+import api_calls
 from helpers import time_helpers
 from scrapers import moodle_login, registrar_login, webwork_login
 from configs import bot_messages, bot_states
-
-from bs4 import BeautifulSoup
-from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, ConversationHandler, RegexHandler
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -92,6 +90,7 @@ def set_main_password(bot, update):
   return bot_states.MAIN_PASSWORD_CHOICE
 
 def help(bot, update):
+  print(update.message)
   update.message.reply_text(bot_messages.help_command_response)
 
 def set_webworks_for_chat(chat_id, webworks):
@@ -258,97 +257,108 @@ def get_all_chats_info():
     pass
 
 def notifying_webworks_process(bot):
-  log_text('Starting to notify about new webworks..')
-  chats = get_all_chats_info()
-  for chat in chats:
-    if chat['notify_webworks']:
-      try:
-        chat_id = chat['chat_id']
-        check_new_webworks(bot, chat_id)
-      except:
-        log_text('Webworks exception occured but still running..')
-        pass
+  while True:
+    if time_helpers.current_time_in_minutes() >= 0 and time_helpers.current_time_in_minutes() <= 719:
+      continue
+    log_text('Starting to notify about new webworks..')
+    chats = get_all_chats_info()
+    for chat in chats:
+      if chat['notify_webworks']:
+        try:
+          chat_id = chat['chat_id']
+          check_new_webworks(bot, chat_id)
+        except:
+          log_text('Webworks exception occured but still running..')
+          pass
+    time.sleep(14400)
 
 def notifying_lectures_process(bot):
   log_text('Starting to notify about upcoming lectures..')
-  chats = get_all_chats_info()
-  for chat in chats:
-    notify_minutes = chat['schedule_notify_minutes']
-    if notify_minutes == 0:
+  while True:
+    if time_helpers.current_time_in_minutes() >= 60 and time_helpers.current_time_in_minutes() <= 480:
       continue
-    chat_id = chat['chat_id']
-    schedule = chat['schedule']
-    current_day = time_helpers.current_day()
-    current_minutes = time_helpers.current_time_in_minutes()
-    if not current_day in schedule:
-      continue
-    for subject in schedule[current_day]:
-      subject_start_time = time_helpers.am_to_pm(subject['start_time'])
-      if subject_start_time - current_minutes == notify_minutes:
-        right_word = 'минут'
-        if (notify_minutes % 10 == 1):
-          right_word = 'минуту'
-        elif (notify_minutes % 10 > 1 and notify_minutes % 10 < 5):
-          right_word = 'минуты'
-        if notify_minutes % 100 > 10 and notify_minutes % 100 < 20:
+    chats = get_all_chats_info()
+    for chat in chats:
+      notify_minutes = chat['schedule_notify_minutes']
+      if notify_minutes == 0:
+        continue
+      chat_id = chat['chat_id']
+      schedule = chat['schedule']
+      current_day = time_helpers.current_day()
+      current_minutes = time_helpers.current_time_in_minutes()
+      if not current_day in schedule:
+        continue
+      for subject in schedule[current_day]:
+        subject_start_time = time_helpers.am_to_pm(subject['start_time'])
+        if subject_start_time - current_minutes == notify_minutes:
           right_word = 'минут'
-        message = 'Урок ровно через <b>{} {}</b>, не опоздай 😉\n\n'.format(notify_minutes, right_word)
-        message = message + '{}\n{} - {}\n{}\n'.format(
-          subject['course_name'],
-          subject['start_time'],
-          subject['end_time'],
-          subject['lecture_room']
-        )
-        send_message(bot, chat_id=chat_id, text=message)
+          if (notify_minutes % 10 == 1):
+            right_word = 'минуту'
+          elif (notify_minutes % 10 > 1 and notify_minutes % 10 < 5):
+            right_word = 'минуты'
+          if notify_minutes % 100 > 10 and notify_minutes % 100 < 20:
+            right_word = 'минут'
+          message = 'Урок ровно через <b>{} {}</b>, не опоздай 😉\n\n'.format(notify_minutes, right_word)
+          message = message + '{}\n{} - {}\n{}\n'.format(
+            subject['course_name'],
+            subject['start_time'],
+            subject['end_time'],
+            subject['lecture_room']
+          )
+          send_message(bot, chat_id=chat_id, text=message)
+    time.sleep(60)
 
 def notifying_grades_process(bot):
-  log_text('Starting to check for new grades..')
-  chats = get_all_chats_info()
-  total_number = len(chats)
-  current_number = 0
-  for chat in chats:
-    current_number += 1
-    if not 'notify_grades' in chat or not chat['notify_grades']:
-      continue
-    try:
-      chat_id = chat['chat_id']
-      username = chat['username']
-      main_password = chat['main_password']
-      log_text('Checking {} grades.. {}/{}'.format(username, current_number, total_number))
-      current_grades = moodle_login.get_grades(username, main_password)
-      if len(current_grades.keys()) == 0:
-        send_message(bot, chat_id=chat_id, text=bot_messages.password_changed_response)
-        api_calls.disable_notify_grades_for_chat(chat_id)
+  grade_cycles = 0
+  while True:
+    #grade_cycles += 1
+    #log_text('Starting to check for new grades.. {}'.format(grade_cycles))
+    chats = get_all_chats_info()
+    total_number = len(chats)
+    current_number = 0
+    for chat in chats:
+      current_number += 1
+      if not 'notify_grades' in chat or not chat['notify_grades']:
         continue
-      old_grades = chat['grades']
-      for course_name, course_grades in current_grades.items():
-        if not course_name in old_grades:
-          old_grades[course_name] = []
-        for course_grade in course_grades:
-          name = course_grade['name']
-          grade = course_grade['grade']
-          unique_grade = True
-          for old_grade in old_grades[course_name]:
-            old_name = old_grade['name']
-            old_grade = old_grade['grade']
-            if old_name == name and old_grade == grade:
-              unique_grade = False
-          if unique_grade and course_name.lower() != 'error' and name.lower() != 'error' and grade.lower() != 'error':
-            send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
-            info = '{} - <b>{}</b>\n'.format('Course name', course_name)
-            info += '{} - <b>{}</b>\n'.format('Grade name', name)
-            info += '{} - <b>{}</b>\n'.format('Grade', grade)
-            if 'range' in course_grade and course_grade['range'].lower() != 'error':
-              info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
-            if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
-              info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])
-            send_message(bot, chat_id=chat_id, text=info)
-            log_text('{} got a new grade'.format(username))
-            log_text('{} - {} - {}'.format(course_name, name, grade))
-      set_grades_for_chat(chat_id, current_grades)
-    except:
-      log_text('Grades exception occured but still running..')
-      pass
+      try:
+        chat_id = chat['chat_id']
+        username = chat['username']
+        main_password = chat['main_password']
+        log_text('Checking {} grades.. {}/{}'.format(username, current_number, total_number))
+        current_grades = moodle_login.get_grades(username, main_password)
+        if len(current_grades.keys()) == 0:
+          send_message(bot, chat_id=chat_id, text=bot_messages.password_changed_response)
+          api_calls.disable_notify_grades_for_chat(chat_id)
+          continue
+        old_grades = chat['grades']
+        for course_name, course_grades in current_grades.items():
+          if not course_name in old_grades:
+            old_grades[course_name] = []
+          for course_grade in course_grades:
+            name = course_grade['name']
+            grade = course_grade['grade']
+            unique_grade = True
+            for old_grade in old_grades[course_name]:
+              old_name = old_grade['name']
+              old_grade = old_grade['grade']
+              if old_name == name and old_grade == grade:
+                unique_grade = False
+            if unique_grade and course_name.lower() != 'error' and name.lower() != 'error' and grade.lower() != 'error':
+              send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
+              info = '{} - <b>{}</b>\n'.format('Course name', course_name)
+              info += '{} - <b>{}</b>\n'.format('Grade name', name)
+              info += '{} - <b>{}</b>\n'.format('Grade', grade)
+              if 'range' in course_grade and course_grade['range'].lower() != 'error':
+                info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
+              if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
+                info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])
+              send_message(bot, chat_id=chat_id, text=info)
+              log_text('{} got a new grade'.format(username))
+              log_text('{} - {} - {}'.format(course_name, name, grade))
+        set_grades_for_chat(chat_id, current_grades)
+      except:
+        log_text('Grades exception occured but still running..')
+        pass
 
 def feedback(bot, update):
   update.message.reply_text(bot_messages.feedback_command_response)
@@ -372,32 +382,30 @@ def any_message_log(bot, update):
     log_text('{} wrote {} to Indigo'.format(chat_info['username'], update.message.text))
 
 def restart_heroku_dynos():
-  log_text('Restarting from a special function..')
-  requests.delete(
-    'https://api.heroku.com/apps/indigo-project/dynos', 
-    auth=(os.environ['EMAIL'], os.environ['PASSWORD']),
-    headers={
-      'Content-Type': 'application/json',
-      'Accept': 'application/vnd.heroku+json; version=3'
-    }
-  )
-
-def repeating_process(bot):
-  schedule.every(12).hours.do(notifying_webworks_process, bot)
-  schedule.every(3).hours.do(restart_heroku_dynos, bot)
-  schedule.every().minute.do(notifying_lectures_process, bot)
-  schedule.every().second.do(notifying_grades_process, bot)
-
   while True:
-    schedule.run_pending()
-    time.sleep(1)
+    time.sleep(18000)
+    log_text('Restarting from a special function..')
+    requests.delete(
+      'https://api.heroku.com/apps/indigo-project/dynos', 
+      auth=(os.environ['EMAIL'], os.environ['PASSWORD']),
+      headers={
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.heroku+json; version=3'
+      }
+    )
 
 def main():
   updater = Updater(os.environ['BOT_TOKEN'])
   
-  if 'INDIGO_PROD' in os.environ:
-    schedule_jobs = threading.Thread(target=repeating_process, args=(updater.bot, ))
-    schedule_jobs.start()  
+  notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
+  notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
+  notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
+  restarting_dynos = threading.Thread(target=restart_heroku_dynos)
+
+  threads = [notifying_webworks, notifying_grades, restarting_dynos, notifying_lectures] if 'INDIGO_PROD' in os.environ else []
+
+  for thread in threads:
+    thread.start()
 
   start_handler = CommandHandler('start', start)
   help_handler = CommandHandler('help', help)
@@ -406,6 +414,7 @@ def main():
   notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
   notify_grades_handler = CommandHandler('notify_grades', notify_grades)
   next_lecture_handler = CommandHandler('next_lecture', next_lecture)
+  #feedback_handler = CommandHandler('feedback', feedback)
   any_message_handler = MessageHandler(Filters.text, any_message_log)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
 
@@ -449,25 +458,21 @@ def main():
     fallbacks=[RegexHandler('[/]*', done)]
   )
 
-  bot_handlers = [
-    start_handler,
-    set_username_handler,
-    set_webwork_password_handler,
-    set_main_password_handler,
-    show_schedule_handler,
-    help_handler,
-    notify_webwork_handler,
-    get_schedule_handler,
-    next_lecture_handler,
-    notify_lectures_handler,
-    notify_grades_handler,
-    feedback_handler,
-    any_message_handler,
-    unknown_command_handler
-  ]
-
-  for handler in bot_handlers:
-    updater.dispatcher.add_handler(handler)
+  updater.dispatcher.add_handler(set_username_handler)
+  updater.dispatcher.add_handler(start_handler)
+  updater.dispatcher.add_handler(set_webwork_password_handler)
+  updater.dispatcher.add_handler(set_main_password_handler)
+  updater.dispatcher.add_handler(show_schedule_handler)
+  updater.dispatcher.add_handler(help_handler)
+  updater.dispatcher.add_handler(notify_webwork_handler)
+  updater.dispatcher.add_handler(get_schedule_handler)
+  updater.dispatcher.add_handler(next_lecture_handler)
+  updater.dispatcher.add_handler(notify_lectures_handler)
+  updater.dispatcher.add_handler(notify_grades_handler)
+  updater.dispatcher.add_handler(notify_grades_handler)
+  updater.dispatcher.add_handler(feedback_handler)
+  updater.dispatcher.add_handler(any_message_handler)
+  updater.dispatcher.add_handler(unknown_command_handler)
 
   updater.start_polling()
 
