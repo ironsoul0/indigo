@@ -384,7 +384,7 @@ def restart_heroku_dynos():
 
 def repeating_process(bot):
   schedule.every(12).hours.do(notifying_webworks_process, bot)
-  schedule.every(3).hours.do(restart_heroku_dynos)
+  schedule.every(3).hours.do(restart_heroku_dynos, bot)
   schedule.every().minute.do(notifying_lectures_process, bot)
   schedule.every().second.do(notifying_grades_process, bot)
 
