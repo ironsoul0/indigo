@@ -90,6 +90,7 @@ def set_main_password(bot, update):
   return bot_states.MAIN_PASSWORD_CHOICE
 
 def help(bot, update):
+  print(update.message)
   update.message.reply_text(bot_messages.help_command_response)
 
 def set_webworks_for_chat(chat_id, webworks):
@@ -360,11 +361,15 @@ def notifying_grades_process(bot):
         pass
 
 def feedback(bot, update):
-  chat_id = update.message.chat_id
-  send_message(bot, chat_id=chat_id, text=bot_messages.feedback_command_response)
-  chat_info = api_calls.get_chat_info(chat_id)
-  if 'username' in chat_info:
-    log_text('{} used /feedback command'.format(chat_info['username']))
+  update.message.reply_text(bot_messages.feedback_command_response)
+  return bot_states.FEEDBACK_CHOICE
+
+def feedback_choice(bot, update):
+  feedback_username, feedback_text = update.message.chat.username, update.message.text
+  final_feedback = '@{} has left feedback 📝\n\n{}'.format(feedback_username, feedback_text)
+  send_message(bot, chat_id='-389544616', text=final_feedback)
+  update.message.reply_text(text=bot_messages.feedback_sent_response)
+  return ConversationHandler.END
 
 def done(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.command_cancel_response)
@@ -409,7 +414,7 @@ def main():
   notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
   notify_grades_handler = CommandHandler('notify_grades', notify_grades)
   next_lecture_handler = CommandHandler('next_lecture', next_lecture)
-  feedback_handler = CommandHandler('feedback', feedback)
+  #feedback_handler = CommandHandler('feedback', feedback)
   any_message_handler = MessageHandler(Filters.text, any_message_log)
   unknown_command_handler = MessageHandler(Filters.command, unknown_command)
 
@@ -441,6 +446,14 @@ def main():
     entry_points=[CommandHandler('notify_lectures', notify_lectures)],
     states={
       bot_states.NOTIFY_MINUTES_CHOICE: [MessageHandler(Filters.text, notify_minutes_choice)]
+    },
+    fallbacks=[RegexHandler('[/]*', done)]
+  )
+
+  feedback_handler = ConversationHandler(
+    entry_points=[CommandHandler('feedback', feedback)],
+    states={
+      bot_states.FEEDBACK_CHOICE: [MessageHandler(Filters.text, feedback_choice)]
     },
     fallbacks=[RegexHandler('[/]*', done)]
   )
