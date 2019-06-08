@@ -270,7 +270,6 @@ def notifying_webworks_process(bot):
         pass
 
 def notifying_lectures_process(bot):
-  print('Notifying about lectures..')
   log_text('Starting to notify about upcoming lectures..')
   chats = get_all_chats_info()
   for chat in chats:
