@@ -47,6 +47,8 @@ help_command_response = "Доступные команды:" \
 
 no_login_or_password_response = 'Пожалуйста укажи свой логин и пароль. \n \nВведи /help, чтобы увидеть команды при помощи которых это можно сделать.'
 
+no_webwork_login_or_password_response = 'Пожалуйста укажи свой логин и пароль для входа в <b>webwork</b>. \n \nИспользуй команды /set_username и /set_webwork_password.'
+
 checking_data_response = 'Один момент. Я проверю твои данные.'
 
 wrong_webwork_data_response = 'Похоже ты ввел неправильные данные, или ты не зарегистрирован ни на один из курсов :('

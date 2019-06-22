@@ -109,7 +109,7 @@ def notify_webwork(bot, update):
   send_chatting_action(bot, chat_id)
   chat_info = api_calls.get_chat_info(chat_id)
   if not 'webwork_password' in chat_info or not 'username' in chat_info:
-    update.message.reply_text(bot_messages.no_login_or_password_response)
+    update.message.reply_text(bot_messages.no_webwork_login_or_password_response, parse_mode='HTML')
   else:
     send_message(bot, chat_id=chat_id, text=bot_messages.checking_data_response)
     current_webworks = webwork_login.get_webworks(chat_info['username'], chat_info['webwork_password'])
