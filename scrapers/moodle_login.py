@@ -1,5 +1,9 @@
 import requests
+import time
 from bs4 import BeautifulSoup
+
+CURRENT_YEAR = '2019'
+CURRENT_SEMESTER = 'summer'
 
 def login_to_moodle(username, password):
   url = "https://moodle.nu.edu.kz/login/index.php"
@@ -17,7 +21,7 @@ def get_grades(username, password):
   html_doc = r.get('https://moodle.nu.edu.kz/grade/report/overview/index.php').text
   soup = BeautifulSoup(html_doc, 'html.parser')
   overview_grade = soup.find(id='overview-grade')
-
+      
   if overview_grade is None:
     r.close()
     return {}
@@ -30,6 +34,13 @@ def get_grades(username, password):
   for tr_grade in trs_grades:
     course_link = tr_grade.td.a
     course_name = course_link.text
+
+    if not CURRENT_YEAR in course_name.lower() or not CURRENT_SEMESTER in course_name.lower():
+      continue
+
+    if 'internship' in course_name.lower():
+      continue
+
     course_href = course_link.get('href')
     html_doc = r.get(course_href).text
     soup = BeautifulSoup(html_doc, 'html.parser')
@@ -41,7 +52,7 @@ def get_grades(username, password):
       column_grade = item_tr.find('td', class_='column-grade')
       column_range = item_tr.find('td', class_='column-range')
       column_percentage = item_tr.find('td', class_='column-percentage')
-
+      
       if column_grade is None or column_itemname is None:
         continue
 

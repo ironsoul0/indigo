@@ -1,6 +1,7 @@
 import telegram
 import requests
 import os
+import re
 import threading
 import time
 import api_calls
@@ -44,10 +45,16 @@ def start(bot, update):
 
 def username_choice(bot, update):
   new_username = update.message.text.lower()
-  log_text('{} wants to join Indigo community'.format(new_username))
-  update.message.reply_text(bot_messages.updated_login_response)
-  api_calls.update_username(update.message.chat_id, new_username)
-  return ConversationHandler.END
+  pattern = re.compile(r"[a-zA-Z]+\.[a-zA-Z]+")
+  found_instance = pattern.search(new_username)
+  if found_instance and found_instance.group() == new_username:
+    log_text('{} wants to join Indigo community'.format(new_username))
+    update.message.reply_text(bot_messages.updated_login_response)
+    api_calls.update_username(update.message.chat_id, new_username)
+    return ConversationHandler.END
+  else:
+    update.message.reply_text(bot_messages.wrong_login_response, parse_mode='HTML')
+    return bot_states.USERNAME_CHOICE
 
 def set_username(bot, update):
   update.message.reply_text(bot_messages.set_username_response, parse_mode='HTML')
@@ -68,7 +75,8 @@ def check_new_webworks(bot, chat_id):
     for new_webwork in webworks:
       if (not course_name in old_webworks) or (not new_webwork in old_webworks[course_name]):
         notify_about_new_webwork(bot, chat_id, course_name, new_webwork)
-  set_webworks_for_chat(chat_id, current_webworks)
+  if 'INDIGO_PROD' in os.environ:
+    set_webworks_for_chat(chat_id, current_webworks)
 
 def webwork_password_choice(bot, update):
   new_password = update.message.text
@@ -91,7 +99,6 @@ def set_main_password(bot, update):
   return bot_states.MAIN_PASSWORD_CHOICE
 
 def help(bot, update):
-  print(update.message)
   update.message.reply_text(bot_messages.help_command_response)
 
 def set_webworks_for_chat(chat_id, webworks):
@@ -125,7 +132,7 @@ def notify_grades(bot, update):
     send_message(bot, chat_id=chat_id, text=bot_messages.checking_data_response)
     current_grades = moodle_login.get_grades(chat_info['username'], chat_info['main_password'])
     if len(current_grades.keys()) == 0:
-      send_message(bot, chat_id=chat_id, text=bot_messages.wrong_registrar_data_response)
+      send_message(bot, chat_id=chat_id, text=bot_messages.wrong_moodle_data_response)
     else:
       send_message(bot, chat_id=chat_id, text=bot_messages.successful_moodle_login_response)
       set_grades_for_chat(chat_id, current_grades)
@@ -356,7 +363,8 @@ def notifying_grades_process(bot):
               send_message(bot, chat_id=chat_id, text=info)
               log_text('{} got a new grade'.format(username))
               log_text('{} - {} - {}'.format(course_name, name, grade))
-        set_grades_for_chat(chat_id, current_grades)
+        if 'INDIGO_PROD' in os.environ:
+          set_grades_for_chat(chat_id, current_grades)
       except:
         log_text('Grades exception occured but still running..')
         pass
@@ -403,7 +411,7 @@ def main():
   notifying_grades = threading.Thread(target=notifying_grades_process, args=(updater.bot, ))
   restarting_dynos = threading.Thread(target=restart_heroku_dynos)
 
-  threads = [notifying_webworks, notifying_grades, restarting_dynos, notifying_lectures] if 'INDIGO_PROD' in os.environ else []
+  threads = [notifying_webworks, notifying_grades, restarting_dynos, notifying_lectures]
 
   for thread in threads:
     thread.start()
