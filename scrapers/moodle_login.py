@@ -3,7 +3,7 @@ import time
 from bs4 import BeautifulSoup
 
 CURRENT_YEAR = '2019'
-CURRENT_SEMESTER = 'summer'
+CURRENT_SEMESTER = 'fall'
 
 def login_to_moodle(username, password):
   url = "https://moodle.nu.edu.kz/login/index.php"
