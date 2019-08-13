@@ -340,7 +340,6 @@ def notifying_grades_process(bot):
           continue
         old_grades = chat['grades']
         for course_name, course_grades in current_grades.items():
-          continue
           if not course_name in old_grades:
             old_grades[course_name] = []
           for course_grade in course_grades:
