@@ -325,10 +325,10 @@ def notifying_grades_process(bot):
     total_number = len(chats)
     current_number = 0
     for chat in chats:
-      current_number += 1
       if not 'notify_grades' in chat or not chat['notify_grades']:
         continue
       try:
+        current_number += 1
         chat_id = chat['chat_id']
         username = chat['username']
         main_password = chat['main_password']
