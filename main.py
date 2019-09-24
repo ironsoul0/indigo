@@ -352,7 +352,7 @@ def notifying_grades_process(bot):
               if old_name == name and old_grade == grade:
                 unique_grade = False
             if unique_grade and course_name.lower() != 'error' and name.lower() != 'error' and grade.lower() != 'error':
-              #send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
+              send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
               info = '{} - <b>{}</b>\n'.format('Course name', course_name)
               info += '{} - <b>{}</b>\n'.format('Grade name', name)
               info += '{} - <b>{}</b>\n'.format('Grade', grade)
@@ -360,7 +360,7 @@ def notifying_grades_process(bot):
                 info += '{} - <b>{}</b>\n'.format('Range', course_grade['range'])
               if 'percentage' in course_grade and course_grade['percentage'].lower() != 'error':
                 info += '{} - <b>{}</b>\n'.format('Percentage', course_grade['percentage'])
-              #send_message(bot, chat_id=chat_id, text=info)
+              send_message(bot, chat_id=chat_id, text=info)
               log_text('{} got a new grade'.format(username))
               log_text('{} - {} - {}'.format(course_name, name, grade))
         if 'INDIGO_PROD' in os.environ:
@@ -412,7 +412,7 @@ def main():
   restarting_dynos = threading.Thread(target=restart_heroku_dynos)
 
   threads = [notifying_webworks, notifying_grades, restarting_dynos, notifying_lectures]
-  #threads = [restarting_dynos, notifying_lectures]
+  threads = [restarting_dynos, notifying_lectures]
   
   for thread in threads:
     thread.start()
