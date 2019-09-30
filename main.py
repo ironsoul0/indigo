@@ -45,16 +45,15 @@ def start(bot, update):
 
 def username_choice(bot, update):
   new_username = update.message.text.lower()
-  pattern = re.compile(r"[a-zA-Z]+\.[a-zA-Z]+")
-  found_instance = pattern.search(new_username)
-  if found_instance and found_instance.group() == new_username:
-    log_text('{} wants to join Indigo community'.format(new_username))
-    update.message.reply_text(bot_messages.updated_login_response)
-    api_calls.update_username(update.message.chat_id, new_username)
-    return ConversationHandler.END
-  else:
-    update.message.reply_text(bot_messages.wrong_login_response, parse_mode='HTML')
-    return bot_states.USERNAME_CHOICE
+  #pattern = re.compile(r"[a-zA-Z]+\.[a-zA-Z]+")
+  #found_instance = pattern.search(new_username)
+  log_text('{} wants to join Indigo community'.format(new_username))
+  update.message.reply_text(bot_messages.updated_login_response)
+  api_calls.update_username(update.message.chat_id, new_username)
+  return ConversationHandler.END
+  #else:
+  #update.message.reply_text(bot_messages.wrong_login_response, parse_mode='HTML')
+  #return bot_states.USERNAME_CHOICE
 
 def set_username(bot, update):
   update.message.reply_text(bot_messages.set_username_response, parse_mode='HTML')
