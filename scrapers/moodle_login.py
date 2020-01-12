@@ -2,8 +2,8 @@ import requests
 import time
 from bs4 import BeautifulSoup
 
-CURRENT_YEAR = '2019'
-CURRENT_SEMESTER = 'fall'
+CURRENT_YEAR = '2020'
+CURRENT_SEMESTER = 'spring'
 
 def login_to_moodle(username, password):
   url = "https://moodle.nu.edu.kz/login/index.php"

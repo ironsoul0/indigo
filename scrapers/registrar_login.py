@@ -8,6 +8,7 @@ def get_schedule(username, password):
   html = r.get(url + "/my-registrar").text
   csrfTokenReg = re.compile(r'name="csrf_token" value="(.+?)"')
   csrfMatch = csrfTokenReg.finditer(html)
+  csrfToken = ""
   for match in csrfMatch:
     csrfToken = match.group(1)
   formIdReg = re.compile(r'name="form_build_id" value="(.+?)"')
