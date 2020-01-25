@@ -37,9 +37,6 @@ def send_chatting_action(bot, chat_id):
   except:
     log_text('No such chat_id using a bot')
 
-def unknown_command(bot, update):
-  send_message(bot, chat_id=update.message.chat_id, text=bot_messages.unknown_command_response)
-
 def start(bot, update):
   send_message(bot, chat_id=update.message.chat_id, text=bot_messages.start_command_response)
 
@@ -96,9 +93,6 @@ def main_password_choice(bot, update):
 def set_main_password(bot, update):
   update.message.reply_text(bot_messages.set_main_password_response, parse_mode='HTML')
   return bot_states.MAIN_PASSWORD_CHOICE
-
-def help(bot, update):
-  update.message.reply_text(bot_messages.help_command_response)
 
 def set_webworks_for_chat(chat_id, webworks):
   api_calls.update_webworks_for_chat(chat_id, webworks)
@@ -428,75 +422,76 @@ def main():
   for thread in threads:
     thread.start()
 
-  start_handler = CommandHandler('start', start)
-  help_handler = CommandHandler('help', help)
-  get_schedule_handler = CommandHandler('get_schedule', get_schedule)
-  show_schedule_handler = CommandHandler('show_schedule', show_schedule)
-  notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
-  notify_grades_handler = CommandHandler('notify_grades', notify_grades)
-  next_lecture_handler = CommandHandler('next_lecture', next_lecture)
-  any_message_handler = MessageHandler(Filters.text, any_message_log)
-  unknown_command_handler = MessageHandler(Filters.command, unknown_command)
-
-  set_username_handler = ConversationHandler(
-    entry_points=[CommandHandler('set_username', set_username)],
-    states={
-      bot_states.USERNAME_CHOICE: [MessageHandler(Filters.text, username_choice)]
-    },
-    fallbacks=[RegexHandler('[/]*', done)]
-  )
-
-  set_main_password_handler = ConversationHandler(
-    entry_points=[CommandHandler('set_main_password', set_main_password)],
-    states={
-      bot_states.MAIN_PASSWORD_CHOICE: [MessageHandler(Filters.text, main_password_choice)]
-    },
-    fallbacks=[RegexHandler('[/]*', done)]
-  )
-
-  set_webwork_password_handler = ConversationHandler(
-    entry_points=[CommandHandler('set_webwork_password', set_webwork_password)],
-    states={
-      bot_states.WEBWORK_PASSWORD_CHOICE: [MessageHandler(Filters.text, webwork_password_choice)]
-    },
-    fallbacks=[RegexHandler('[/]*', done)]
-  )
-
-  notify_lectures_handler = ConversationHandler(
-    entry_points=[CommandHandler('notify_lectures', notify_lectures)],
-    states={
-      bot_states.NOTIFY_MINUTES_CHOICE: [MessageHandler(Filters.text, notify_minutes_choice)]
-    },
-    fallbacks=[RegexHandler('[/]*', done)]
-  )
-
-  feedback_handler = ConversationHandler(
-    entry_points=[CommandHandler('feedback', feedback)],
-    states={
-      bot_states.FEEDBACK_CHOICE: [MessageHandler(Filters.text, feedback_choice)]
-    },
-    fallbacks=[RegexHandler('[/]*', done)]
-  )
-
-  bot_handlers = [
-    start_handler,
-    set_username_handler,
-    set_webwork_password_handler,
-    set_main_password_handler,
-    show_schedule_handler,
-    help_handler,
-    notify_webwork_handler,
-    get_schedule_handler,
-    next_lecture_handler,
-    notify_lectures_handler,
-    notify_grades_handler,
-    feedback_handler,
-    any_message_handler,
-    unknown_command_handler
-  ]
-
   for handler in commands.handlers:
     updater.dispatcher.add_handler(handler)
+
+  # start_handler = CommandHandler('start', start)
+  # help_handler = CommandHandler('help', help)
+  # get_schedule_handler = CommandHandler('get_schedule', get_schedule)
+  # show_schedule_handler = CommandHandler('show_schedule', show_schedule)
+  # notify_webwork_handler = CommandHandler('notify_webwork', notify_webwork)
+  # notify_grades_handler = CommandHandler('notify_grades', notify_grades)
+  # next_lecture_handler = CommandHandler('next_lecture', next_lecture)
+  # any_message_handler = MessageHandler(Filters.text, any_message_log)
+  # unknown_command_handler = MessageHandler(Filters.command, unknown_command)
+
+  # set_username_handler = ConversationHandler(
+  #   entry_points=[CommandHandler('set_username', set_username)],
+  #   states={
+  #     bot_states.USERNAME_CHOICE: [MessageHandler(Filters.text, username_choice)]
+  #   },
+  #   fallbacks=[RegexHandler('[/]*', done)]
+  # )
+
+  # set_main_password_handler = ConversationHandler(
+  #   entry_points=[CommandHandler('set_main_password', set_main_password)],
+  #   states={
+  #     bot_states.MAIN_PASSWORD_CHOICE: [MessageHandler(Filters.text, main_password_choice)]
+  #   },
+  #   fallbacks=[RegexHandler('[/]*', done)]
+  # )
+
+  # set_webwork_password_handler = ConversationHandler(
+  #   entry_points=[CommandHandler('set_webwork_password', set_webwork_password)],
+  #   states={
+  #     bot_states.WEBWORK_PASSWORD_CHOICE: [MessageHandler(Filters.text, webwork_password_choice)]
+  #   },
+  #   fallbacks=[RegexHandler('[/]*', done)]
+  # )
+
+  # notify_lectures_handler = ConversationHandler(
+  #   entry_points=[CommandHandler('notify_lectures', notify_lectures)],
+  #   states={
+  #     bot_states.NOTIFY_MINUTES_CHOICE: [MessageHandler(Filters.text, notify_minutes_choice)]
+  #   },
+  #   fallbacks=[RegexHandler('[/]*', done)]
+  # )
+
+  # feedback_handler = ConversationHandler(
+  #   entry_points=[CommandHandler('feedback', feedback)],
+  #   states={
+  #     bot_states.FEEDBACK_CHOICE: [MessageHandler(Filters.text, feedback_choice)]
+  #   },
+  #   fallbacks=[RegexHandler('[/]*', done)]
+  # )
+
+  # bot_handlers = [
+  #   start_handler,
+  #   set_username_handler,
+  #   set_webwork_password_handler,
+  #   set_main_password_handler,
+  #   show_schedule_handler,
+  #   help_handler,
+  #   notify_webwork_handler,
+  #   get_schedule_handler,
+  #   next_lecture_handler,
+  #   notify_lectures_handler,
+  #   notify_grades_handler,
+  #   feedback_handler,
+  #   any_message_handler,
+  #   unknown_command_handler
+  # ]
+
 
   # updater.dispatcher.add_handler(start1.start_handler)
 

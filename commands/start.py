@@ -8,6 +8,6 @@ response_text =  (
 )
 
 def handler(update, context):
-  context.bot.send_message(chat_id=update.effective_chat.id, text=response_text)
+  update.message.reply_text(response_text)
 
 start_handler = CommandHandler('start', handler)
