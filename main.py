@@ -410,7 +410,7 @@ class Indigo:
     for handler in command_handlers:
       self.updater.dispatcher.add_handler(handler)
 
-from commands import start as start1
+import commands
 
 def main():
   updater = Updater(os.environ['BOT_TOKEN'], use_context=True)
@@ -495,7 +495,10 @@ def main():
     unknown_command_handler
   ]
 
-  updater.dispatcher.add_handler(start1.start_handler)
+  for handler in commands.handlers:
+    updater.dispatcher.add_handler(handler)
+
+  # updater.dispatcher.add_handler(start1.start_handler)
 
   # for handler in bot_handlers:
   #   updater.dispatcher.add_handler(handler)
