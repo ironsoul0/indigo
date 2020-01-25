@@ -402,8 +402,18 @@ def restart_heroku_dynos():
       }
     )
 
+class Indigo:
+  def __init__(self, token):
+    self.updater = Updater(token)
+
+  def setup_handlers(self, command_handlers):
+    for handler in command_handlers:
+      self.updater.dispatcher.add_handler(handler)
+
+from commands import start as start1
+
 def main():
-  updater = Updater(os.environ['BOT_TOKEN'])
+  updater = Updater(os.environ['BOT_TOKEN'], use_context=True)
   
   notifying_lectures = threading.Thread(target=notifying_lectures_process, args=(updater.bot, ))
   notifying_webworks = threading.Thread(target=notifying_webworks_process, args=(updater.bot, ))
@@ -411,9 +421,10 @@ def main():
   restarting_dynos = threading.Thread(target=restart_heroku_dynos)
 
   # threads = [notifying_webworks, notifying_grades, restarting_dynos, notifying_lectures]
-  threads = [notifying_lectures, notifying_webworks, notifying_grades, restarting_dynos]
+  # threads = [notifying_lectures, notifying_webworks, notifying_grades, restarting_dynos]
   #threads = [restarting_dynos, notifying_lectures]
-  
+  threads = []
+
   for thread in threads:
     thread.start()
 
@@ -484,8 +495,11 @@ def main():
     unknown_command_handler
   ]
 
-  for handler in bot_handlers:
-    updater.dispatcher.add_handler(handler)
+  updater.dispatcher.add_handler(start1.start_handler)
+
+  # for handler in bot_handlers:
+  #   updater.dispatcher.add_handler(handler)
+  
 
   updater.start_polling()
 
