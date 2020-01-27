@@ -1,5 +1,10 @@
 from telegram.ext import CommandHandler 
 
+def handler(update, context):
+  update.message.reply_text(response_text)
+
+help_handler = CommandHandler('help', handler)
+
 response_text = (
   "Доступные команды:\n\n"
   "1. /set_username - обновление логина\n" 
@@ -14,8 +19,3 @@ response_text = (
   "10. /feedback - сообщить о баге, предложить новый функционал\n" 
   "11. /help - список всех доступных команд"
 )
-
-def handler(update, context):
-  update.message.reply_text(response_text)
-
-help_handler = CommandHandler('help', handler)

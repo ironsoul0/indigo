@@ -16,6 +16,12 @@ from configs import bot_messages, bot_states
 from dotenv import load_dotenv
 load_dotenv()
 
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
 def log_text(debug_text):
   print(debug_text)
 
@@ -406,6 +412,9 @@ class Indigo:
 
 import commands
 
+def error(update, context):
+  logger.warning('Update "%s" caused error "%s"', update, context.error)
+
 def main():
   updater = Updater(os.environ['BOT_TOKEN'], use_context=True)
   
@@ -418,6 +427,8 @@ def main():
   # threads = [notifying_lectures, notifying_webworks, notifying_grades, restarting_dynos]
   #threads = [restarting_dynos, notifying_lectures]
   threads = []
+
+  updater.dispatcher.add_error_handler(error)
 
   for thread in threads:
     thread.start()
