@@ -4,3 +4,4 @@
 
 # All sensitive info like tokens, passwords, etc.
 .env
+get.py
