@@ -350,7 +350,7 @@ def notifying_grades_process(bot):
               old_grade = old_grade['grade']
               if old_name == name and old_grade == grade:
                 unique_grade = False
-            if unique_grade and course_name.lower() != 'error' and name.lower() != 'error' and grade.lower() != 'error':
+            if False and unique_grade and course_name.lower() != 'error' and name.lower() != 'error' and grade.lower() != 'error':
               send_message(bot, chat_id=chat_id, text='Новая оценка!\n\n')
               info = '{} - <b>{}</b>\n'.format('Course name', course_name)
               info += '{} - <b>{}</b>\n'.format('Grade name', name)
@@ -411,7 +411,7 @@ def main():
   restarting_dynos = threading.Thread(target=restart_heroku_dynos)
 
   # threads = [notifying_webworks, notifying_grades, restarting_dynos, notifying_lectures]
-  threads = [restarting_dynos]
+  threads = [notifying_webworks, notifying_grades, restarting_dynos]
   #threads = [restarting_dynos, notifying_lectures]
   
   for thread in threads:
