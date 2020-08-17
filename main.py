@@ -411,7 +411,8 @@ def main():
   restarting_dynos = threading.Thread(target=restart_heroku_dynos)
 
   # threads = [notifying_webworks, notifying_grades, restarting_dynos, notifying_lectures]
-  threads = [notifying_webworks, notifying_grades, restarting_dynos]
+  #threads = [notifying_webworks, notifying_grades, restarting_dynos]
+  threads = []
   #threads = [restarting_dynos, notifying_lectures]
   
   for thread in threads:
